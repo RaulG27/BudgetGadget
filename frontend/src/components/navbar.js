@@ -1,34 +1,73 @@
 import React, { useEffect, useState } from "react";
 import getUserInfo from '../utilities/decodeJwt';
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import ReactNavbar from 'react-bootstrap/Navbar';
 
+// Define the CSS styles in a JavaScript object
+const sidebarStyles = {
+  height: '100%',
+  width: '250px', // Adjust width as needed
+  position: 'fixed',
+  top: '0',
+  left: '-250px', // Hide sidebar initially
+  backgroundColor: '#343a40', // Dark background
+  color: 'white',
+  transition: '0.3s', // Smooth transition
+  zIndex: '1000', // Ensure it stays on top
+  overflow: 'auto',
+  paddingTop: '60px', // Space for the toggle button
+  borderRadius: '10px'
+};
 
-// Here, we display our Navbar
+const sidebarShowStyles = {
+  left: '0', // Show sidebar when class is added
+};
+
+const buttonStyles = {
+  fontSize: '20px',
+  cursor: 'pointer',
+  backgroundColor: '#343a40',
+  color: 'white',
+  border: 'none',
+  padding: '10px 15px',
+  position: 'fixed',
+  top: '20px',
+  left: '20px',
+  zIndex: '1001',
+};
+
+const linkStyles = {
+  padding: '10px 15px',
+  textDecoration: 'none',
+  color: 'white',
+  display: 'block',
+  transition: '0.3s',
+};
+
+const linkHoverStyles = {
+  backgroundColor: '#495057', // Highlight on hover
+};
+
 export default function Navbar() {
-  // We are pulling in the user's info but not using it for now.
-  // Warning disabled: 
-  // eslint-disable-next-line
-  const [user, setUser] = useState({})
+  const [, setUser] = useState({});
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-  setUser(getUserInfo())
-  }, [])
-  
-  // if (!user) return null   - for now, let's show the bar even not logged in.
-  // we have an issue with getUserInfo() returning null after a few minutes
-  // it seems.
-  return (
-    <ReactNavbar bg="dark" variant="dark">
-    <Container>
-      <Nav className="me-auto">
-        <Nav.Link href="/">Start</Nav.Link>
-        <Nav.Link href="/home">Home</Nav.Link>
-        <Nav.Link href="/privateUserProfile">Profile</Nav.Link>
-      </Nav>
-    </Container>
-  </ReactNavbar>
+    setUser(getUserInfo());
+  }, []);
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <>
+      <button style={buttonStyles} onClick={toggleSidebar}>
+        ☰
+      </button>
+      <div style={{ ...sidebarStyles, ...(isOpen ? sidebarShowStyles : {}) }}>
+        <a href="/" style={{ ...linkStyles, ':hover': linkHoverStyles }} onClick={toggleSidebar}>Start</a>
+        <a href="/home" style={{ ...linkStyles, ':hover': linkHoverStyles }} onClick={toggleSidebar}>Home</a>
+        <a href="/privateUserProfile" style={{ ...linkStyles, ':hover': linkHoverStyles }} onClick={toggleSidebar}>Profile</a>
+      </div>
+    </>
   );
 }

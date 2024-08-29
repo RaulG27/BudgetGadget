@@ -1,25 +1,67 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import getUserInfo from '../../utilities/decodeJwt'
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import getUserInfo from '../../utilities/decodeJwt';
+
 const HomePage = () => {
-    const [user, setUser] = useState({})
-    const navigate = useNavigate()
+    const [user, setUser] = useState({});
+    const navigate = useNavigate();
     const handleClick = (e) => {
         e.preventDefault();
-        localStorage.removeItem('accessToken')
-        return navigate('/')
-    }
+        localStorage.removeItem('accessToken');
+        return navigate('/');
+    };
 
     useEffect(() => {
-        setUser(getUserInfo())
-    }, [])
+        setUser(getUserInfo());
+    }, []);
 
+    // Styles for the content area
+    const containerStyles = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh', // Full viewport height
+        backgroundColor: '#6BA57A', // Background color
+        textAlign: 'center', // Center text
+        padding: '20px', // Add some padding
+    };
 
-    if (!user) return (
-        <div><h4>Log in to view this page.</h4></div>)
-    const { id, email, username, password } = user
+    // Styles for individual colored containers
+    const boxStyles = {
+        width: '200px',
+        height: '200px',
+        backgroundColor: '#273A3A', // Container background color
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '10px', // Space between containers
+        borderRadius: '10px', // Optional: Add border radius for rounded corners
+    };
+
+    // Conditional rendering based on user data
+    if (!user) {
+        return (
+            <div style={containerStyles}>
+                <h4>Log in to view this page.</h4>
+            </div>
+        );
+    }
+
+    const { id, email, username, password } = user;
+
     return (
-        <>
+        <div style={containerStyles}>
+            {/* Render 8 containers */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {Array.from({ length: 8 }).map((_, index) => (
+                    <div key={index} style={boxStyles}>
+                        Container {index + 1}
+                    </div>
+                ))}
+            </div>
+
             <div>
                 <h3>
                     Welcome
@@ -35,14 +77,14 @@ const HomePage = () => {
                 </h3>
                 <h3>
                     Your password is
-                    <span className='password'> {password} ( hashed )</span>
+                    <span className='password'> {password} (hashed)</span>
                 </h3>
             </div>
             <button onClick={(e) => handleClick(e)}>
                 Log Out
             </button>
-        </>
-    )
-}
+        </div>
+    );
+};
 
-export default HomePage
+export default HomePage;
