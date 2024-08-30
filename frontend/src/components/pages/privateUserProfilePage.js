@@ -4,9 +4,6 @@ import Modal from "react-bootstrap/Modal";
 import { useNavigate } from "react-router-dom";
 import getUserInfo from "../../utilities/decodeJwt";
 
-// Link to service
-// http://localhost:8096/privateUserProfile
-
 const PrivateUserProfile = () => {
   const [show, setShow] = useState(false);
   const [user, setUser] = useState({});
@@ -54,10 +51,15 @@ const PrivateUserProfile = () => {
     </div>
   );
 
+  const { id, email, username, password } = user;
+
   return (
     <div style={pageContainerStyles}>
       <div style={contentBoxStyles}>
-        <h1>{user.username}</h1>
+        <h1>Welcome <span className='username'> @{username}</span></h1>
+        <h3>Your userId in mongo db is: <span className='userId'> {id}</span></h3>
+        <h3>Your registered email is: <span className='email'> {email}</span></h3>
+        
         <Button className="me-2" onClick={handleShow}>
           Log Out
         </Button>

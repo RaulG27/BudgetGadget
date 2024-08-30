@@ -5,12 +5,7 @@ import getUserInfo from '../../utilities/decodeJwt';
 const HomePage = () => {
     const [user, setUser] = useState({});
     const navigate = useNavigate();
-    const handleClick = (e) => {
-        e.preventDefault();
-        localStorage.removeItem('accessToken');
-        return navigate('/');
-    };
-
+    
     useEffect(() => {
         setUser(getUserInfo());
     }, []);
@@ -27,18 +22,45 @@ const HomePage = () => {
         padding: '20px', // Add some padding
     };
 
-    // Styles for individual colored containers
-    const boxStyles = {
-        width: '200px',
-        height: '200px',
-        backgroundColor: '#273A3A', // Container background color
+    // Container styles with dynamic size
+    const boxStyles = (size,index) => ({
+        width: size.width,
+        height: size.height,
+        backgroundColor: index === 3 ? '#113D3D' : '#273A3A', // Background color for Container 4
         color: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         margin: '10px', // Space between containers
-        borderRadius: '10px', // Optional: Add border radius for rounded corners
+        borderRadius: '10px', // Rounded corners
+         marginTop: size.marginTop || '10px'
+    });
+
+    // Container sizes
+    const sizes = [
+        { width: '500px', height: '250px', marginTop:'105px' }, // Container 1
+        { width: '500px', height: '250px' }, // Container 2
+        { width: '500px', height: '250px' }, // Container 3
+        { width: '700px', height: '100px', marginTop: '-335px' }, // Container 4
+        { width: '700px', height: '200px' }, // Container 5
+        { width: '700px', height: '250px' }, // Container 6
+        { width: '600px', height: '300px', marginTop:"-65px" }, // Container 7
+        { width: '600px', height: '300px' }, // Container 8
+    ];
+
+    // Define styles for the container groups
+    const groupStyles = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '10px',
     };
+
+    // Group container indices
+    const group1 = [0, 1, 2]; // First 3 containers
+    const group2 = [3, 4, 5]; // Next 3 containers
+    const group3 = [6, 7];    // Last 2 containers
 
     // Conditional rendering based on user data
     if (!user) {
@@ -49,40 +71,32 @@ const HomePage = () => {
         );
     }
 
-    const { id, email, username, password } = user;
-
     return (
         <div style={containerStyles}>
-            {/* Render 8 containers */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {Array.from({ length: 8 }).map((_, index) => (
-                    <div key={index} style={boxStyles}>
-                        Container {index + 1}
-                    </div>
-                ))}
+            {/* Render containers in groups */}
+            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <div style={groupStyles}>
+                    {group1.map((index) => (
+                        <div key={index} style={boxStyles(sizes[index])}>
+                            Container {index + 1}
+                        </div>
+                    ))}
+                </div>
+                <div style={groupStyles}>
+                    {group2.map((index) => (
+                        <div key={index} style={boxStyles(sizes[index])}>
+                            Container {index + 1}
+                        </div>
+                    ))}
+                </div>
+                <div style={groupStyles}>
+                    {group3.map((index) => (
+                        <div key={index} style={boxStyles(sizes[index])}>
+                            Container {index + 1}
+                        </div>
+                    ))}
+                </div>
             </div>
-
-            <div>
-                <h3>
-                    Welcome
-                    <span className='username'> @{username}</span>
-                </h3>
-                <h3>
-                    Your userId in mongo db is
-                    <span className='userId'> {id}</span>
-                </h3>
-                <h3>
-                    Your registered email is
-                    <span className='email'> {email}</span>
-                </h3>
-                <h3>
-                    Your password is
-                    <span className='password'> {password} (hashed)</span>
-                </h3>
-            </div>
-            <button onClick={(e) => handleClick(e)}>
-                Log Out
-            </button>
         </div>
     );
 };
