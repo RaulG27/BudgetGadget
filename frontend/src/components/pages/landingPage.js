@@ -3,6 +3,7 @@ import Card from 'react-bootstrap/Card';
 
 const Landingpage = () => {
     // Styles for the page container
+    
     const pageContainerStyles = {
         display: 'flex',
         justifyContent: 'center', // Center horizontally
@@ -36,8 +37,8 @@ const Landingpage = () => {
             <div style={contentBoxStyles}>
                 <Card style={cardStyles} className="mx-2 my-2">
                     <Card.Body>
-                        <Card.Title>Professor Brockenbrough's User Skeleton App</Card.Title>
-                        <Card.Subtitle className="mb-2 text-muted">A starting point for an application.</Card.Subtitle>
+                        <Card.Title>BudgetGadget</Card.Title>
+                        <Card.Subtitle className="mb-2 text-muted">An Open Source finance management solution.</Card.Subtitle>
                         <Card.Text>
                         </Card.Text>
                         <Card.Link href="/signup">Sign Up</Card.Link>

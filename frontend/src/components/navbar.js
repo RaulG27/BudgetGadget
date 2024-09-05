@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom"; // Import useLocation
 import getUserInfo from '../utilities/decodeJwt';
-import { FaHome, FaTachometerAlt, FaUser } from 'react-icons/fa'; // Import the icons
+import { FaHome, FaTachometerAlt, FaUser, FaGithub } from 'react-icons/fa'; // Import the icons
 import { CiLogin } from "react-icons/ci";
 
 // Define the CSS styles in a JavaScript object
@@ -92,6 +92,11 @@ export default function Navbar() {
         ☰
       </button>
       <div style={{ ...sidebarStyles, ...(isOpen ? sidebarShowStyles : {}) }}>
+        
+      <a href="https://github.com/RaulG27/BudgetGadget" style={{ ...linkStyles,}} onClick={toggleSidebar}>
+          <FaGithub style={iconStyles} /> BudgetGadget
+        </a>
+
         <a href="/" style={{ ...linkStyles, ...getLinkStyle('/') }} onClick={toggleSidebar}>
           <CiLogin style={iconStyles} /> Landing Page
         </a>
@@ -101,6 +106,8 @@ export default function Navbar() {
         <a href="/privateUserProfile" style={{ ...linkStyles, ...getLinkStyle('/privateUserProfile') }} onClick={toggleSidebar}>
           <FaUser style={iconStyles} /> Profile
         </a>
+
+
       </div>
     </>
   );

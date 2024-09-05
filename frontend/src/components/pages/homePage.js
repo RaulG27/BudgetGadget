@@ -38,14 +38,14 @@ const HomePage = () => {
 
     // Container sizes
     const sizes = [
-        { width: '500px', height: '250px', marginTop:'105px' }, // Container 1
-        { width: '500px', height: '250px' }, // Container 2
+        { width: '500px', height: '250px', marginTop:'155px' }, // Container 1
+        { width: '500px', height: '300px' }, // Container 2
         { width: '500px', height: '250px' }, // Container 3
         { width: '700px', height: '100px', marginTop: '-335px' }, // Container 4
         { width: '700px', height: '200px' }, // Container 5
         { width: '700px', height: '250px' }, // Container 6
-        { width: '600px', height: '300px', marginTop:"-65px" }, // Container 7
-        { width: '600px', height: '300px' }, // Container 8
+        { width: '600px', height: '400px', marginTop:"135px" }, // Container 7
+        { width: '600px', height: '400px' }, // Container 8
     ];
 
     // Define styles for the container groups
