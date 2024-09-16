@@ -2,7 +2,7 @@ POST http://localhost:8081/user/signup
 Content-Type: application/json
 
 {
-    "username": "DarthHNDRX",
-    "email": "albertico1127@hotmail.com",
-    "password": "yourPassword123"
+    "username": "username",
+    "email": "user@gmail.com",
+    "password": "password"
 }
