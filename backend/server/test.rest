@@ -1,8 +1,25 @@
-POST http://localhost:8081/user/signup
+POST http://localhost:8081/user/entries
 Content-Type: application/json
 
 {
-    "username": "username",
-    "email": "user@gmail.com",
-    "password": "password"
+    "userid": "66e7cc598ba469d6a4400983",
+    "amount": 100,
+    "type": "income",
+    "date": "2024-09-16T07:43:33Z"
 }
+####
+
+
+POST http://localhost:8081/user/entries
+Content-Type: application/json
+
+{
+    "userid": "66e7cc598ba469d6a4400983",
+    "amount": 200,
+    "type": "expense",
+    "date": "2024-09-16T07:43:33Z"
+}
+
+####
+GET http://localhost:8081/user/entries
+Content-Type: application/json
