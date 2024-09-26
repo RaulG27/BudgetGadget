@@ -1,14 +1,13 @@
-// routes/userFinancialEntry.js
 const express = require('express');
 const router = express.Router();
 const FinancialEntry = require('../models/financialEntryModel');
 
 // Route to create a financial entry
 router.post('/entries', async (req, res) => {
-    const { userid, amount, type, date } = req.body;
+    const { userid, amount, type, date, comments } = req.body; // Include comments
 
     // Validate the input
-    if (!userid || !amount || !type || !date) {
+    if (!userid || !amount || !type) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -23,7 +22,8 @@ router.post('/entries', async (req, res) => {
             userid,
             amount,
             type,
-            date: new Date(date) // Ensure date is a valid Date object
+            date: date ? new Date(date) : new Date(), // Set current date if not provided
+            comments: comments || '' // Set comments, default to empty string
         });
 
         // Save the financial entry to the database
@@ -39,7 +39,7 @@ router.post('/entries', async (req, res) => {
 router.get('/entries', async (req, res) => {
     try {
         // Fetch all financial entries from the database
-        const entries = await FinancialEntry.find();
+        const entries = await FinancialEntry.find().sort({ date: -1 }); // Sort entries by date, newest first
         
         // Send the fetched entries as a response
         res.status(200).json(entries);

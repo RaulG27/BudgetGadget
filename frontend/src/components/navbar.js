@@ -11,14 +11,17 @@ const sidebarStyles = {
   position: 'fixed',
   top: '0',
   left: '-250px', // Hide sidebar initially
-  backgroundColor: '#273A3A', // Dark background
+  backgroundColor: '#2C3E50', // Dark background
   color: 'white',
   transition: '0.2s', // Smooth transition
   zIndex: '1000', // Ensure it stays on top
   overflow: 'auto',
   paddingTop: '60px', // Space for the toggle button
   borderTopRightRadius: '10px',
-  borderBottomRightRadius:'10px'
+  borderBottomRightRadius:'10px',
+  overflow: "hidden",
+  background: 'linear-gradient(to right, #2C3E50, rgba(44, 62, 80, 0.9))',
+  boxShadow: '0px 0 20px rgba(0,0, 0, 0.7)'
 };
 
 const sidebarShowStyles = {
@@ -28,7 +31,7 @@ const sidebarShowStyles = {
 const buttonStyles = {
   fontSize: '20px',
   cursor: 'pointer',
-  backgroundColor: '#273A3A',
+  backgroundColor: '#2C3E50',
   color: 'white',
   border: 'none',
   padding: '10px 15px',

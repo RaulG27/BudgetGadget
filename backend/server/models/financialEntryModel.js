@@ -18,7 +18,11 @@ const financialEntrySchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        default: Date.now
+        default: Date.now // Automatically sets to current date
+    },
+    comments: { // Add this field for comments
+        type: String,
+        default: '' // Default to an empty string
     }
 }, {
     collection: 'financial_entries'
