@@ -7,7 +7,8 @@ const HomePage = () => {
     const [formData, setFormData] = useState({
         amount: '',
         type: 'income',
-        comments: '' // Added comments field
+        comments: '',
+        isRecurring: false
     });
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
@@ -39,18 +40,23 @@ const HomePage = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, type, checked, value } = e.target;
+        setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
     };
-
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { amount, type, comments } = formData;
+        const { amount, type, comments, isRecurring } = formData;
+    
 
-        if (!user.id) {
-            setMessage('User ID is missing. Please log in again.');
-            return;
-        }
+        console.log('Form Data Before Submission:', {
+            userid: user.id,
+            amount: Number(amount),
+            type,
+            date: new Date().toISOString(),
+            comments,
+            isRecurring: isRecurring // Check this value
+        });
 
         try {
             const response = await fetch('http://localhost:8081/user/entries', {
@@ -63,14 +69,15 @@ const HomePage = () => {
                     amount: Number(amount),
                     type,
                     date: new Date().toISOString(),
-                    comments // Include comments in the POST request
+                    comments,
+                    isRecurring: isRecurring, // This should already be a boolean
                 }),
             });
-
+    
             const data = await response.json();
             if (response.ok) {
                 setMessage('Entry added successfully!');
-                setFormData({ amount: '', type: 'income', comments: '' }); // Reset comments field
+                setFormData({ amount: '', type: 'income', comments: '', isRecurring: false });
                 fetchEntries(user.id);
             } else {
                 setMessage(`Error: ${data.message}`);
@@ -110,18 +117,18 @@ const HomePage = () => {
         margin: '10px',
         borderRadius: '10px',
         marginTop: size.marginTop || '10px',
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)'
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
     });
 
     const sizes = [
-        { width: '500px', height: '250px', marginTop: '155px' },
-        { width: '500px', height: '300px' },
-        { width: '500px', height: '250px' },
-        { width: '700px', height: '100px', marginTop: '-335px' },
-        { width: '700px', height: '200px' },
-        { width: '700px', height: '250px' },
-        { width: '600px', height: '400px', marginTop: '135px' },
-        { width: '600px', height: '400px' },
+        { width: '300px', height: '250px', marginTop: '155px' },
+        { width: '300px', height: '300px' },
+        { width: '300px', height: '250px' },
+        { width: '300px', height: '100px', marginTop: '-335px' },
+        { width: '300px', height: '200px' },
+        { width: '300px', height: '250px' },
+        { width: '300px', height: '400px', marginTop: '135px' },
+        { width: '300px', height: '400px' },
     ];
 
     const groupStyles = {
@@ -177,6 +184,15 @@ const HomePage = () => {
                                             value={formData.comments}
                                             onChange={handleChange}
                                         />
+                                        <label>
+                                        <input
+                                            type="checkbox"
+                                            name="isRecurring"
+                                            checked={formData.isRecurring}
+                                            onChange={handleChange}
+                                        />
+                                            Recurring Cost?
+                                        </label>
                                         <button type="submit">Add Entry</button>
                                     </form>
                                     {message && <p>{message}</p>}
@@ -208,41 +224,41 @@ const HomePage = () => {
 
             {/* Modal for displaying entries */}
             {showModal && (
-    <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }}>
-        <div style={{
-            backgroundColor: '#2C3E50', // Dark background for the modal
-            padding: '20px',
-            borderRadius: '10px',
-            maxWidth: '500px',
-            width: '100%',
-        }}>
-            <h3 style={{ color: 'white' }}>Previous Entries</h3> {/* Set text color to white */}
-            <ul style={{ color: 'white' }}> {/* Set list text color to white */}
-                {sortedEntries.map(entry => (
-                    <li key={entry._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ color: 'white' }}>{entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}</span>
-                        <span style={{ marginLeft: '10px', fontStyle: 'italic', color: '#ccc' }}> {/* Lighter color for comments */}
-                            {entry.comments}
-                        </span>
-                    </li>
-                ))}
-            </ul>
-            <button onClick={toggleModal} style={{ marginTop: '10px', backgroundColor: '#6BA57A', color: '#fff', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
-                Close
-            </button>
-        </div>
-    </div>
-)}
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}>
+                    <div style={{
+                        backgroundColor: '#2C3E50', // Dark background for the modal
+                        padding: '20px',
+                        borderRadius: '10px',
+                        maxWidth: '500px',
+                        width: '100%',
+                    }}>
+                        <h3 style={{ color: 'white' }}>Previous Entries</h3>
+                        <ul style={{ color: 'white' }}>
+                            {sortedEntries.map(entry => (
+                                <li key={entry._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ color: 'white' }}>{entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}</span>
+                                    <span style={{ marginLeft: '10px', fontStyle: 'italic', color: '#ccc' }}>
+                                        {entry.comments}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                        <button onClick={toggleModal} style={{ marginTop: '10px', backgroundColor: '#6BA57A', color: '#fff', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

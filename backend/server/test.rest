@@ -5,7 +5,8 @@ Content-Type: application/json
     "userid": "66e7cc598ba469d6a4400983",
     "amount": 100,
     "type": "income",
-    "date": "2024-09-16T07:43:33Z"
+    "date": "2024-09-16T07:43:33Z",
+    "isRecurring": true
 }
 ####
 
