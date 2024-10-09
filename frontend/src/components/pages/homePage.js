@@ -8,22 +8,87 @@ const HomePage = () => {
         amount: '',
         type: 'income',
         comments: '',
-        isRecurring: false
+        isRecurring: false,
     });
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
+    const [dailyBudget, setDailyBudget] = useState(0);
 
     useEffect(() => {
         const userInfo = getUserInfo();
         if (userInfo) {
             setUser(userInfo);
             fetchEntries(userInfo.id);
+            fetchDailyBudget(userInfo.id);
         } else {
             setMessage('User not logged in. Please log in to access this page.');
         }
     }, []);
+    const fetchDailyBudget = async (userid) => {
+        try {
+            const response = await fetch(`http://localhost:8081/budget/daily?userid=${userid}`);
+            
+            // Check if the response status is not ok
+            if (!response.ok) {
+                const errorText = await response.text(); // Get the response as text
+                console.error('Error fetching daily budget:', errorText);
+                setMessage('Failed to fetch daily budget.');
+                return;
+            }
+    
+            // Parse the JSON response
+            const data = await response.json();
+    
+            // Check if the data contains an amount
+            if (data && data.amount !== undefined) {
+                setDailyBudget(data.amount);
+            } else {
+                console.error('Unexpected response format:', data);
+                setMessage('Invalid response format.');
+            }
+        } catch (error) {
+            console.error('Error fetching daily budget:', error);
+            setMessage('Error fetching daily budget.');
+        }
+    };
+    
+    const updateDailyBudget = async (newAmount) => {
+        try {
+            const response = await fetch('http://localhost:8081/budget/daily', {
+                method: 'PUT', // Changed to PUT
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userid: user.id,
+                    amount: newAmount,
+                }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                setDailyBudget(data.amount);
+                setMessage('Daily budget updated successfully!');
+            } else {
+                setMessage(`Error: ${data.message}`);
+                console.error('Error response:', data);
+            }
+        } catch (error) {
+            setMessage('Error updating the daily budget.');
+            console.error('Update error:', error);
+        }
+    };
+
+    const handleBudgetChange = (e) => {
+        setDailyBudget(e.target.value);
+    };
+
+    const handleBudgetSubmit = (e) => {
+        e.preventDefault();
+        updateDailyBudget(Number(dailyBudget));
+    };
 
     const fetchEntries = async (userid) => {
         try {
@@ -43,20 +108,10 @@ const HomePage = () => {
         const { name, type, checked, value } = e.target;
         setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { amount, type, comments, isRecurring } = formData;
-    
-
-        console.log('Form Data Before Submission:', {
-            userid: user.id,
-            amount: Number(amount),
-            type,
-            date: new Date().toISOString(),
-            comments,
-            isRecurring: isRecurring // Check this value
-        });
 
         try {
             const response = await fetch('http://localhost:8081/user/entries', {
@@ -70,10 +125,10 @@ const HomePage = () => {
                     type,
                     date: new Date().toISOString(),
                     comments,
-                    isRecurring: isRecurring, // This should already be a boolean
+                    isRecurring,
                 }),
             });
-    
+
             const data = await response.json();
             if (response.ok) {
                 setMessage('Entry added successfully!');
@@ -153,6 +208,18 @@ const HomePage = () => {
 
     return (
         <div style={containerStyles}>
+            <div>
+                <h2>Daily Budget: ${dailyBudget}</h2>
+                <form onSubmit={handleBudgetSubmit}>
+                    <input
+                        type="number"
+                        value={dailyBudget}
+                        onChange={handleBudgetChange}
+                        required
+                    />
+                    <button type="submit">Update Daily Budget</button>
+                </form>
+            </div>
             <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                 <div style={groupStyles}>
                     {group1.map((index) => (
@@ -185,18 +252,29 @@ const HomePage = () => {
                                             onChange={handleChange}
                                         />
                                         <label>
-                                        <input
-                                            type="checkbox"
-                                            name="isRecurring"
-                                            checked={formData.isRecurring}
-                                            onChange={handleChange}
-                                        />
+                                            <input
+                                                type="checkbox"
+                                                name="isRecurring"
+                                                checked={formData.isRecurring}
+                                                onChange={handleChange}
+                                            />
                                             Recurring Cost?
                                         </label>
                                         <button type="submit">Add Entry</button>
                                     </form>
                                     {message && <p>{message}</p>}
-                                    <button onClick={toggleModal} style={{ marginTop: '10px', backgroundColor: '#fff', color: '#000', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
+                                    <button
+                                        onClick={toggleModal}
+                                        style={{
+                                            marginTop: '10px',
+                                            backgroundColor: '#fff',
+                                            color: '#000',
+                                            border: 'none',
+                                            borderRadius: '5px',
+                                            padding: '5px 10px',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
                                         All Entries
                                     </button>
                                 </div>
@@ -236,7 +314,7 @@ const HomePage = () => {
                     justifyContent: 'center',
                 }}>
                     <div style={{
-                        backgroundColor: '#2C3E50', // Dark background for the modal
+                        backgroundColor: '#2C3E50',
                         padding: '20px',
                         borderRadius: '10px',
                         maxWidth: '500px',
@@ -245,15 +323,32 @@ const HomePage = () => {
                         <h3 style={{ color: 'white' }}>Previous Entries</h3>
                         <ul style={{ color: 'white' }}>
                             {sortedEntries.map(entry => (
-                                <li key={entry._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ color: 'white' }}>{entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}</span>
+                                <li key={entry._id} style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                }}>
+                                    <span style={{ color: 'white' }}>
+                                        {entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}
+                                    </span>
                                     <span style={{ marginLeft: '10px', fontStyle: 'italic', color: '#ccc' }}>
                                         {entry.comments}
                                     </span>
                                 </li>
                             ))}
                         </ul>
-                        <button onClick={toggleModal} style={{ marginTop: '10px', backgroundColor: '#6BA57A', color: '#fff', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
+                        <button
+                            onClick={toggleModal}
+                            style={{
+                                marginTop: '10px',
+                                backgroundColor: '#6BA57A',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '5px',
+                                padding: '5px 10px',
+                                cursor: 'pointer',
+                            }}
+                        >
                             Close
                         </button>
                     </div>

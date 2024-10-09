@@ -9,9 +9,8 @@ const editUser = require('./routes/userEditUser');
 const deleteUser = require('./routes/userDeleteAll');
 const userFinancialEntry = require('./routes/userFinancialEntry');
 const connectDB = require('./config/db.config'); // Ensure your DB config file is correct
-
+const userDailyBudget = require('./routes/userDailyBudget');
 require('dotenv').config();
-
 const SERVER_PORT = process.env.PORT || 8081;
 
 // Middleware
@@ -26,6 +25,7 @@ app.use('/user', getUserByIdRoute);
 app.use('/user', editUser);
 app.use('/user', deleteUser);
 app.use('/user', userFinancialEntry); // Financial entries route
+app.use('/budget', userDailyBudget); // Daily budget route
 
 // Start server after connecting to DB
 connectDB().then(() => {

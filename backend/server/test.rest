@@ -26,3 +26,13 @@ Content-Type: application/json
 ####
 GET http://localhost:8081/user/entries
 Content-Type: application/json
+
+
+####
+POST http://localhost:8081/budget/daily
+Content-Type: application/json
+
+{
+    "userid": "66e7cc598ba469d6a4400983",
+    "amount": 50
+}

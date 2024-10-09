@@ -13,8 +13,7 @@ import { createContext, useState, useEffect } from "react";
 import getUserInfo from "./utilities/decodeJwt";
 
 export const UserContext = createContext();
-//test change
-//test again
+
 const App = () => {
   const [user, setUser] = useState();
 
