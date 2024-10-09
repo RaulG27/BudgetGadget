@@ -1,4 +1,3 @@
-// models/financialEntryModel.js
 const mongoose = require('mongoose');
 
 // Define the schema for a financial entry
@@ -25,13 +24,13 @@ const financialEntrySchema = new mongoose.Schema({
         type: String,
         default: '' // Default to an empty string
     },
-    isRecurring: {
-        type: Boolean,
-        default: false // Default to false
+    recurring_cost: {
+        type: [String],
+        enum: ['Housing', 'Utilities', 'Food', 'Entertainment', 'Savings', 'Transportation', 'Miscellaneous'], // Must be one of the specified values
+        default: ['Miscellaneous']
     }
 }, {
     collection: 'financial_entries',
-    
 });
 
 // Create the model from the schema
@@ -39,4 +38,3 @@ const FinancialEntry = mongoose.model('FinancialEntry', financialEntrySchema);
 
 // Export the model for use in other files
 module.exports = FinancialEntry;
-

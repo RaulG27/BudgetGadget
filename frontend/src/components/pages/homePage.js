@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Select from 'react-select';
 import getUserInfo from '../../utilities/decodeJwt';
 
 const HomePage = () => {
@@ -8,13 +9,23 @@ const HomePage = () => {
         amount: '',
         type: 'income',
         comments: '',
-        isRecurring: false,
+        recurring_cost: [], // Changed to an array
     });
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const navigate = useNavigate();
     const [dailyBudget, setDailyBudget] = useState(0);
+
+    const recurringOptions = [
+        { value: 'Housing', label: 'Housing' },
+        { value: 'Utilities', label: 'Utilities' },
+        { value: 'Food', label: 'Food' },
+        { value: 'Entertainment', label: 'Entertainment' },
+        { value: 'Savings', label: 'Savings' },
+        { value: 'Transportation', label: 'Transportation' },
+        { value: 'Miscellaneous', label: 'Miscellaneous' },
+    ];
 
     useEffect(() => {
         const userInfo = getUserInfo();
@@ -26,22 +37,17 @@ const HomePage = () => {
             setMessage('User not logged in. Please log in to access this page.');
         }
     }, []);
+
     const fetchDailyBudget = async (userid) => {
         try {
             const response = await fetch(`http://localhost:8081/budget/daily?userid=${userid}`);
-            
-            // Check if the response status is not ok
             if (!response.ok) {
-                const errorText = await response.text(); // Get the response as text
+                const errorText = await response.text();
                 console.error('Error fetching daily budget:', errorText);
                 setMessage('Failed to fetch daily budget.');
                 return;
             }
-    
-            // Parse the JSON response
             const data = await response.json();
-    
-            // Check if the data contains an amount
             if (data && data.amount !== undefined) {
                 setDailyBudget(data.amount);
             } else {
@@ -53,18 +59,13 @@ const HomePage = () => {
             setMessage('Error fetching daily budget.');
         }
     };
-    
+
     const updateDailyBudget = async (newAmount) => {
         try {
             const response = await fetch('http://localhost:8081/budget/daily', {
-                method: 'PUT', // Changed to PUT
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userid: user.id,
-                    amount: newAmount,
-                }),
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userid: user.id, amount: newAmount }),
             });
 
             const data = await response.json();
@@ -109,30 +110,47 @@ const HomePage = () => {
         setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
     };
 
+    const handleRecurringCostChange = (selectedOptions) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            recurring_cost: selectedOptions ? selectedOptions.map(option => option.value) : [],
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { amount, type, comments, isRecurring } = formData;
+        const { amount, type, comments, recurring_cost } = formData;
+
+        // Validate recurring_cost values
+        const validRecurringCosts = [
+            'Housing', 'Utilities', 'Food',
+            'Entertainment', 'Savings', 'Transportation',
+            'Miscellaneous'
+        ];
+        const invalidCosts = recurring_cost.filter(cost => !validRecurringCosts.includes(cost));
+        if (invalidCosts.length > 0) {
+            setMessage(`Invalid recurring cost(s): ${invalidCosts.join(', ')}`);
+            return;
+        }
 
         try {
             const response = await fetch('http://localhost:8081/user/entries', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userid: user.id,
                     amount: Number(amount),
                     type,
                     date: new Date().toISOString(),
                     comments,
-                    isRecurring,
+                    recurring_cost, // Send the validated array
                 }),
             });
 
             const data = await response.json();
             if (response.ok) {
                 setMessage('Entry added successfully!');
-                setFormData({ amount: '', type: 'income', comments: '', isRecurring: false });
+                setFormData({ amount: '', type: 'income', comments: '', recurring_cost: [] });
                 fetchEntries(user.id);
             } else {
                 setMessage(`Error: ${data.message}`);
@@ -164,7 +182,7 @@ const HomePage = () => {
     const boxStyles = (size, index) => ({
         width: size.width,
         height: size.height,
-        backgroundColor: index === 3 ? '#2C3E50' : '#2C3E50',
+        backgroundColor: '#2C3E50',
         color: 'white',
         display: 'flex',
         alignItems: 'center',
@@ -176,7 +194,7 @@ const HomePage = () => {
     });
 
     const sizes = [
-        { width: '300px', height: '250px', marginTop: '155px' },
+        { width: '400px', height: '250px', marginTop: '155px' },
         { width: '300px', height: '300px' },
         { width: '300px', height: '250px' },
         { width: '300px', height: '100px', marginTop: '-335px' },
@@ -251,15 +269,24 @@ const HomePage = () => {
                                             value={formData.comments}
                                             onChange={handleChange}
                                         />
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                name="isRecurring"
-                                                checked={formData.isRecurring}
-                                                onChange={handleChange}
-                                            />
-                                            Recurring Cost?
-                                        </label>
+                                        <Select
+                                            isMulti
+                                            name="recurring_cost"
+                                            options={recurringOptions}
+                                            className="basic-multi-select"
+                                            classNamePrefix="select"
+                                            onChange={handleRecurringCostChange}
+                                            styles={{
+                                                option: (provided) => ({
+                                                    ...provided,
+                                                    color: 'black', // Text color for options
+                                                }),
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    backgroundColor: 'white', // Ensure control background is white
+                                                }),
+                                            }}
+                                        />
                                         <button type="submit">Add Entry</button>
                                     </form>
                                     {message && <p>{message}</p>}

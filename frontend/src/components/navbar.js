@@ -1,35 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom"; // Import useLocation
+import { useLocation } from "react-router-dom";
 import getUserInfo from '../utilities/decodeJwt';
-import { FaHome, FaTachometerAlt, FaUser, FaGithub } from 'react-icons/fa'; // Import the icons
+import { FaHome, FaTachometerAlt, FaUser, FaGithub } from 'react-icons/fa';
 import { CiLogin } from "react-icons/ci";
 
-// Define the CSS styles in a JavaScript object
 const sidebarStyles = {
   height: '100%',
-  width: '250px', // Adjust width as needed
+  width: '150px', // Reduced width
   position: 'fixed',
   top: '0',
-  left: '-250px', // Hide sidebar initially
-  backgroundColor: '#2C3E50', // Dark background
+  left: '-150px', // Hide sidebar initially
+  backgroundColor: '#2C3E50',
   color: 'white',
-  transition: '0.2s', // Smooth transition
-  zIndex: '1000', // Ensure it stays on top
+  transition: '0.2s',
+  zIndex: '1000',
   overflow: 'auto',
-  paddingTop: '60px', // Space for the toggle button
+  paddingTop: '20px', // Reduced padding
   borderTopRightRadius: '10px',
-  borderBottomRightRadius:'10px',
-  overflow: "hidden",
+  borderBottomRightRadius: '10px',
   background: 'linear-gradient(to right, #2C3E50, rgba(44, 62, 80, 0.9))',
-  boxShadow: '0px 0 20px rgba(0,0, 0, 0.7)'
+  boxShadow: '0px 0 20px rgba(0,0, 0, 0.7)',
 };
 
 const sidebarShowStyles = {
-  left: '0', // Show sidebar when class is added
+  left: '0',
 };
 
 const buttonStyles = {
-  fontSize: '20px',
+  fontSize: '25px',
   cursor: 'pointer',
   backgroundColor: '#2C3E50',
   color: 'white',
@@ -39,42 +37,41 @@ const buttonStyles = {
   top: '10px',
   left: '10px',
   zIndex: '1001',
-  borderRadius: '10px'
+  borderRadius: '10px',
 };
 
 const linkStyles = {
-  padding: '15px 15px',
+  padding: '10px 10px', // Reduced padding
   textDecoration: 'none',
   color: 'white',
   display: 'flex',
   alignItems: 'center',
   transition: '0.3s',
-  marginBottom: '100px',
+  marginBottom: '20px', // Reduced bottom margin
   position: 'relative',
   borderRadius: '5px',
-  fontSize:'25px'
+  fontSize: '16px', // Reduced font size
+  marginTop: '45px',
 };
 
 const linkHoverStyles = {
-  backgroundColor: '#1C1C1C', // Highlight on hover
+  backgroundColor: '#1C1C1C',
 };
 
 const iconStyles = {
-  marginRight: '25px', // Space between icon and text
-  fontSize: '65px',
-  height:'110px'
+  marginRight: '10px', // Reduced space between icon and text
+  fontSize: '40px', // Reduced icon size
 };
 
-// Active link styles
 const activeLinkStyles = {
-  backgroundColor: 'rgba(28, 28, 28, 0.55)', // Dark bar color with 80% opacity
+  backgroundColor: 'rgba(28, 28, 28, 0.55)',
   color: 'lightgray',
 };
 
 export default function Navbar() {
   const [, setUser] = useState({});
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation(); // Use useLocation to get the current path
+  const location = useLocation();
 
   useEffect(() => {
     setUser(getUserInfo());
@@ -84,7 +81,6 @@ export default function Navbar() {
     setIsOpen(!isOpen);
   };
 
-  // Determine if the link is active
   const getLinkStyle = (path) => {
     return location.pathname === path ? activeLinkStyles : {};
   };
@@ -95,8 +91,7 @@ export default function Navbar() {
         ☰
       </button>
       <div style={{ ...sidebarStyles, ...(isOpen ? sidebarShowStyles : {}) }}>
-        
-      <a href="https://github.com/RaulG27/BudgetGadget" style={{ ...linkStyles,}} onClick={toggleSidebar}>
+        <a href="https://github.com/RaulG27/BudgetGadget" style={{ ...linkStyles }} onClick={toggleSidebar}>
           <FaGithub style={iconStyles} /> BudgetGadget
         </a>
 
@@ -109,8 +104,6 @@ export default function Navbar() {
         <a href="/privateUserProfile" style={{ ...linkStyles, ...getLinkStyle('/privateUserProfile') }} onClick={toggleSidebar}>
           <FaUser style={iconStyles} /> Profile
         </a>
-
-
       </div>
     </>
   );
