@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
 import getUserInfo from '../../utilities/decodeJwt';
+import '../styles/global.css'; // Importing global CSS
+
+Chart.register(ArcElement, Tooltip, Legend);
+
+const currentDate = new Date().toLocaleDateString();
 
 const HomePage = () => {
     const [user, setUser] = useState({});
@@ -9,13 +16,14 @@ const HomePage = () => {
         amount: '',
         type: 'income',
         comments: '',
-        recurring_cost: [], // Changed to an array
+        recurring_cost: [],
     });
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const navigate = useNavigate();
     const [dailyBudget, setDailyBudget] = useState(0);
+    const [todayExpenses, setTodayExpenses] = useState(0);
+    const navigate = useNavigate();
 
     const recurringOptions = [
         { value: 'Housing', label: 'Housing' },
@@ -60,6 +68,30 @@ const HomePage = () => {
         }
     };
 
+    const fetchEntries = async (userid) => {
+        try {
+            const response = await fetch(`http://localhost:8081/user/entries?userid=${userid}`);
+            const data = await response.json();
+            if (response.ok) {
+                setEntries(data);
+                calculateTodayExpenses(data);
+            } else {
+                console.error('Error fetching entries:', data);
+            }
+        } catch (error) {
+            console.error('Error fetching entries:', error);
+        }
+    };
+
+    const calculateTodayExpenses = (entries) => {
+        const today = new Date().toISOString().split('T')[0];
+        const expensesToday = entries
+            .filter(entry => entry.type === 'expense' && new Date(entry.date).toISOString().split('T')[0] === today)
+            .reduce((total, entry) => total + entry.amount, 0);
+        
+        setTodayExpenses(expensesToday);
+    };
+
     const updateDailyBudget = async (newAmount) => {
         try {
             const response = await fetch('http://localhost:8081/budget/daily', {
@@ -91,20 +123,6 @@ const HomePage = () => {
         updateDailyBudget(Number(dailyBudget));
     };
 
-    const fetchEntries = async (userid) => {
-        try {
-            const response = await fetch(`http://localhost:8081/user/entries?userid=${userid}`);
-            const data = await response.json();
-            if (response.ok) {
-                setEntries(data);
-            } else {
-                console.error('Error fetching entries:', data);
-            }
-        } catch (error) {
-            console.error('Error fetching entries:', error);
-        }
-    };
-
     const handleChange = (e) => {
         const { name, type, checked, value } = e.target;
         setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
@@ -121,7 +139,6 @@ const HomePage = () => {
         e.preventDefault();
         const { amount, type, comments, recurring_cost } = formData;
 
-        // Validate recurring_cost values
         const validRecurringCosts = [
             'Housing', 'Utilities', 'Food',
             'Entertainment', 'Savings', 'Transportation',
@@ -143,7 +160,7 @@ const HomePage = () => {
                     type,
                     date: new Date().toISOString(),
                     comments,
-                    recurring_cost, // Send the validated array
+                    recurring_cost,
                 }),
             });
 
@@ -167,220 +184,112 @@ const HomePage = () => {
     };
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    const containerStyles = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#6BA57A',
-        textAlign: 'center',
-        padding: '20px',
+    
+    const pieChartData = {
+        labels: ['Daily Budget', 'Spent Today'],
+        datasets: [
+            {
+                data: [dailyBudget, todayExpenses],
+                backgroundColor: ['#3498DB', '#E74C3C'], // Blue and Red
+                hoverBackgroundColor: ['#2980B9', '#C0392B'], // Darker shades for hover
+            
+            },
+        ],
     };
-
-    const boxStyles = (size, index) => ({
-        width: size.width,
-        height: size.height,
-        backgroundColor: '#2C3E50',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '10px',
-        borderRadius: '10px',
-        marginTop: size.marginTop || '10px',
-        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.5)',
-    });
-
-    const sizes = [
-        { width: '400px', height: '250px', marginTop: '155px' },
-        { width: '300px', height: '300px' },
-        { width: '300px', height: '250px' },
-        { width: '300px', height: '100px', marginTop: '-335px' },
-        { width: '300px', height: '200px' },
-        { width: '300px', height: '250px' },
-        { width: '300px', height: '400px', marginTop: '135px' },
-        { width: '300px', height: '400px' },
-    ];
-
-    const groupStyles = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        margin: '10px',
-    };
-
-    const group1 = [0, 1, 2];
-    const group2 = [3, 4, 5];
-    const group3 = [6, 7];
-
-    if (!user) {
-        return (
-            <div style={containerStyles}>
-                <h4>Log in to view this page.</h4>
-            </div>
-        );
-    }
 
     return (
-        <div style={containerStyles}>
-            <div>
-                <h2>Daily Budget: ${dailyBudget}</h2>
-                <form onSubmit={handleBudgetSubmit}>
-                    <input
-                        type="number"
-                        value={dailyBudget}
-                        onChange={handleBudgetChange}
-                        required
-                    />
-                    <button type="submit">Update Daily Budget</button>
-                </form>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                <div style={groupStyles}>
-                    {group1.map((index) => (
-                        <div key={index} style={boxStyles(sizes[index], index)}>
-                            {index === 0 ? (
-                                <div>
-                                    <h3>Add Financial Entry</h3>
-                                    <form onSubmit={handleSubmit}>
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            placeholder="Amount"
-                                            value={formData.amount}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                        <select
-                                            name="type"
-                                            value={formData.type}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="income">Income</option>
-                                            <option value="expense">Expense</option>
-                                        </select>
-                                        <input
-                                            type="text"
-                                            name="comments"
-                                            placeholder="Comments"
-                                            value={formData.comments}
-                                            onChange={handleChange}
-                                        />
-                                        <Select
-                                            isMulti
-                                            name="recurring_cost"
-                                            options={recurringOptions}
-                                            className="basic-multi-select"
-                                            classNamePrefix="select"
-                                            onChange={handleRecurringCostChange}
-                                            styles={{
-                                                option: (provided) => ({
-                                                    ...provided,
-                                                    color: 'black', // Text color for options
-                                                }),
-                                                control: (provided) => ({
-                                                    ...provided,
-                                                    backgroundColor: 'white', // Ensure control background is white
-                                                }),
-                                            }}
-                                        />
-                                        <button type="submit">Add Entry</button>
-                                    </form>
-                                    {message && <p>{message}</p>}
-                                    <button
-                                        onClick={toggleModal}
-                                        style={{
-                                            marginTop: '10px',
-                                            backgroundColor: '#fff',
-                                            color: '#000',
-                                            border: 'none',
-                                            borderRadius: '5px',
-                                            padding: '5px 10px',
-                                            cursor: 'pointer',
-                                        }}
-                                    >
-                                        All Entries
-                                    </button>
-                                </div>
-                            ) : (
-                                `Container ${index + 1}`
-                            )}
-                        </div>
-                    ))}
+        <div className="background-container">
+            <div className="container">
+                <div className="header">
+                    <h2>Daily Budget: ${dailyBudget}</h2>
+                    <form onSubmit={handleBudgetSubmit}>
+                        <input
+                            type="number"
+                            value={dailyBudget}
+                            onChange={handleBudgetChange}
+                            required
+                        />
+                        <button type="submit">Update</button>
+                    </form>
                 </div>
-                <div style={groupStyles}>
-                    {group2.map((index) => (
-                        <div key={index} style={boxStyles(sizes[index], index)}>
-                            Container {index + 1}
+                <div className="content">
+                    <div className="chart-container">
+                        <h3>Total Amount Spent:</h3>
+                        <h2>${todayExpenses}</h2>
+                        <div>{currentDate}</div>
+                        <div className="pie-chart">
+                            <Pie data={pieChartData} options={{ maintainAspectRatio: true, responsive: true, color:'white' }} />
                         </div>
-                    ))}
-                </div>
-                <div style={groupStyles}>
-                    {group3.map((index) => (
-                        <div key={index} style={boxStyles(sizes[index], index)}>
-                            Container {index + 1}
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Modal for displaying entries */}
-            {showModal && (
-                <div style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}>
-                    <div style={{
-                        backgroundColor: '#2C3E50',
-                        padding: '20px',
-                        borderRadius: '10px',
-                        maxWidth: '500px',
-                        width: '100%',
-                    }}>
-                        <h3 style={{ color: 'white' }}>Previous Entries</h3>
-                        <ul style={{ color: 'white' }}>
-                            {sortedEntries.map(entry => (
-                                <li key={entry._id} style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                }}>
-                                    <span style={{ color: 'white' }}>
-                                        {entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}
-                                    </span>
-                                    <span style={{ marginLeft: '10px', fontStyle: 'italic', color: '#ccc' }}>
-                                        {entry.comments}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-                        <button
-                            onClick={toggleModal}
-                            style={{
-                                marginTop: '10px',
-                                backgroundColor: '#6BA57A',
-                                color: '#fff',
-                                border: 'none',
-                                borderRadius: '5px',
-                                padding: '5px 10px',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Close
-                        </button>
+                    </div>
+                    <div className="financial-entry">
+                        <h3>Add Financial Entry</h3>
+                        <form onSubmit={handleSubmit}>
+                            <input
+                                type="number"
+                                name="amount"
+                                placeholder="Amount"
+                                value={formData.amount}
+                                onChange={handleChange}
+                                required
+                            />
+                            <select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                            >
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                            </select>
+                            <input
+                                type="text"
+                                name="comments"
+                                placeholder="Comments"
+                                value={formData.comments}
+                                onChange={handleChange}
+                            />
+                            <Select
+                                isMulti
+                                name="recurring_cost"
+                                options={recurringOptions}
+                                onChange={handleRecurringCostChange}
+                            />
+                            <button type="submit">Add Entry</button>
+                        </form>
+                        {message && <p>{message}</p>}
+                        <button onClick={toggleModal}>All Entries</button>
                     </div>
                 </div>
-            )}
+                <div className="extra-containers">
+                    <div className="container-box">Container 3</div>
+                    <div className="container-box">Container 4</div>
+                    <div className="container-box">Container 5</div>
+                    <div className="container-box">Container 6</div>
+                    <div className="container-box">Container 7</div>
+                    <div className="container-box">Container 8</div>
+                </div>
+                {showModal && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <div className="modal-inner-content"> {/* Added this div for better readability */}
+                                <h3>Previous Entries</h3>
+                                <ul>
+                                    {sortedEntries.map(entry => (
+                                        <li key={entry._id} className="entry-item">
+                                            <span>
+                                                {entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}
+                                            </span>
+                                            <span className="entry-comments">
+                                                {entry.comments}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button onClick={toggleModal} className="modal-close-btn">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
