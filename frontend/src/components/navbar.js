@@ -10,7 +10,7 @@ const sidebarStyles = {
   position: 'fixed',
   top: '0',
   left: '-150px', // Hide sidebar initially
-  backgroundColor: '#2C3E50',
+  backgroundColor: '#1a1a1a',
   color: 'white',
   transition: '0.2s',
   zIndex: '1000',
@@ -18,7 +18,7 @@ const sidebarStyles = {
   paddingTop: '20px', // Reduced padding
   borderTopRightRadius: '10px',
   borderBottomRightRadius: '10px',
-  background: 'linear-gradient(to right, #2C3E50, rgba(44, 62, 80, 0.9))',
+  background: '#1a1a1a',
   boxShadow: '0px 0 20px rgba(0,0, 0, 0.7)',
 };
 
@@ -29,12 +29,12 @@ const sidebarShowStyles = {
 const buttonStyles = {
   fontSize: '25px',
   cursor: 'pointer',
-  backgroundColor: '#2C3E50',
+  backgroundColor: '#2a2a2a',
   color: 'white',
   border: 'none',
   padding: '10px 15px',
   position: 'fixed',
-  top: '10px',
+  top: '2.8%',
   left: '10px',
   zIndex: '1001',
   borderRadius: '10px',

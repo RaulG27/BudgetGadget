@@ -6,7 +6,7 @@
 }
 
 .background-container {
-    background-color: #6BA57A; /* Set background color */
+    background-color: #121212; /* Set background color */
     color: white; /* Set text color for contrast */
     min-height: 100vh; /* Ensure it covers the full viewport height */
 }
@@ -23,7 +23,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #273A3A;
+    background-color: #2a2a2a;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(1, 1, 1, 1);
@@ -35,9 +35,13 @@
     margin: 0;
 }
 
+.header button{
+    margin-left:20px;
+}
+
 /* Content styling */
 .content {
-    background-color: #6BA57A;
+    background-color: #121212;
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -47,11 +51,31 @@
 .chart-container,
 .financial-entry {
     flex: 1;
-    background-color: #273A3A;
+    background-color: #2A2A2A;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(1, 1, 1, 1);
-    color: white;
+    color: white; margin-top: 25px;
+}
+
+.currentDate{
+
+    font-size:32px;
+    margin-bottom: -100px;
+}
+
+.pie-chart{
+ height: 300px;
+ right:35%;
+ 
+}
+
+.pie-chart2 {
+    display: flex;           /* Enables Flexbox */
+    justify-content: center; /* Centers the chart horizontally */
+    align-items: center;     /* Centers the chart vertically */
+    flex-grow: 1;           /* Allows the container to grow */
+    max-width: 100%;        /* Prevents overflow */
 }
 
 .financial-entry form {
@@ -63,6 +87,14 @@
 .financial-entry select,
 .financial-entry button {
     margin-bottom: 10px;
+}
+
+
+
+/* Styling for the recurring cost */
+.recurring-costs {
+    color: black;
+
 }
 
 /* Extra containers styling */
@@ -80,12 +112,18 @@
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(1, 1, 1, 1);
     text-align: center;
+    
 }
 
 /* Pie chart styling */
 .pie-chart {
-    position: relative;
-    height: 300px;
+    height: 100%;
+    margin-left: 300px;
+}
+
+.pie-chart2{
+    height: 100%;
+    width:400px;
 }
 
 /* Modal styling */
@@ -138,16 +176,6 @@
     color: #ccc;
 }
 
-.modal-close-btn {
-    margin-top: 10px;
-    background-color: #6BA57A;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
 /* Responsive styles */
 @media (max-width: 768px) {
     .content {
@@ -172,4 +200,14 @@
     .header {
         flex-direction: column; /* Stack header items vertically on very small screens */
     }
+}
+
+.button {
+    margin-top: 10px;
+    background-color: rgb(53, 143, 173);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color:white;
 }

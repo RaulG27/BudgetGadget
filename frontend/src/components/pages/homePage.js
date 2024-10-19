@@ -21,7 +21,7 @@ const HomePage = () => {
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [dailyBudget, setDailyBudget] = useState(0);
+    const [dailyBudget, setDailyBudget] = useState(0);Select
     const [todayExpenses, setTodayExpenses] = useState(0);
     const navigate = useNavigate();
 
@@ -185,17 +185,50 @@ const HomePage = () => {
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    const pieChartData = {
+    // Prepare data for the first pie chart (Daily Budget vs. Today Expenses)
+    const pieChart1Data = {
         labels: ['Daily Budget', 'Spent Today'],
         datasets: [
             {
                 data: [dailyBudget, todayExpenses],
                 backgroundColor: ['#3498DB', '#E74C3C'], // Blue and Red
                 hoverBackgroundColor: ['#2980B9', '#C0392B'], // Darker shades for hover
-            
             },
         ],
     };
+
+    // Prepare data for the second pie chart (Spending by Category)
+    const categoryTotals = {
+        Housing: 0,
+        Utilities: 0,
+        Food: 0,
+        Entertainment: 0,
+        Savings: 0,
+        Transportation: 0,
+        Miscellaneous: 0,
+    };
+
+    entries.forEach(entry => {
+        if (entry.type === 'expense') {
+            entry.recurring_cost.forEach(cost => {
+                if (categoryTotals[cost] !== undefined) {
+                    categoryTotals[cost] += entry.amount;
+                }
+            });
+        }
+    });
+
+    const pieChart2Data = {
+        labels: Object.keys(categoryTotals),
+        datasets: [
+            {
+                data: Object.values(categoryTotals),
+                backgroundColor: ['#3498DB', '#E74C3C', '#F1C40F', '#2ECC71', '#9B59B6', '#34495E', '#E67E22'], // Different colors for each category
+                hoverBackgroundColor: ['#2980B9', '#C0392B', '#F39C12', '#27AE60', '#8E44AD', '#2C3E50', '#D35400'], // Darker shades for hover
+            },
+        ],
+    };
+    
 
     return (
         <div className="background-container">
@@ -209,16 +242,20 @@ const HomePage = () => {
                             onChange={handleBudgetChange}
                             required
                         />
-                        <button type="submit">Update</button>
+                        <button type="submit" className="button">Update</button>
                     </form>
                 </div>
                 <div className="content">
                     <div className="chart-container">
-                        <h3>Total Amount Spent:</h3>
+                        <h3>Total Amount Spent Today:</h3>
                         <h2>${todayExpenses}</h2>
-                        <div>{currentDate}</div>
+                        <div className="currentDate">{currentDate}</div>
                         <div className="pie-chart">
-                            <Pie data={pieChartData} options={{ maintainAspectRatio: true, responsive: true, color:'white' }} />
+                            <Pie data={pieChart1Data} options={{ plugins: {
+                                            legend: {position: 'bottom', labels:{color:'white ',font: {weight: 'bold'}}},
+                                                    },
+                                                        }
+                                                            } />
                         </div>
                     </div>
                     <div className="financial-entry">
@@ -247,21 +284,44 @@ const HomePage = () => {
                                 value={formData.comments}
                                 onChange={handleChange}
                             />
-                            <Select
-                                isMulti
-                                name="recurring_cost"
-                                options={recurringOptions}
-                                onChange={handleRecurringCostChange}
-                            />
-                            <button type="submit">Add Entry</button>
+                            <div className="recurring-costs">
+                                <Select
+                                    isMulti
+                                    name="recurring_cost"
+                                    options={recurringOptions}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
+                                    onChange={handleRecurringCostChange}
+                                />
+                            </div>
+                            <button type="submit" className="button">Add Entry</button>
                         </form>
                         {message && <p>{message}</p>}
-                        <button onClick={toggleModal}>All Entries</button>
+                        <button onClick={toggleModal} className="button">All Entries</button>
                     </div>
                 </div>
+
+                <div className="content">
+                        <div className="chart-container">
+                            <h3>Spending by Category:</h3>
+                            <div className="pie-chart2">
+                                <Pie 
+                                    data={pieChart2Data} 
+                                    options={{
+                                        maintainAspectRatio: true, responsive: true,
+                                        plugins: {
+                                            legend: { display: true, position: 'left', labels:{color:'white'} },
+                                        },
+                                    }} 
+                                />
+                            </div>
+                        </div>
+                    
+                    <div className="chart-container">Container 4</div> {/* Moved Container 4 here */}
+                    
+                </div>
                 <div className="extra-containers">
-                    <div className="container-box">Container 3</div>
-                    <div className="container-box">Container 4</div>
                     <div className="container-box">Container 5</div>
                     <div className="container-box">Container 6</div>
                     <div className="container-box">Container 7</div>
@@ -270,7 +330,7 @@ const HomePage = () => {
                 {showModal && (
                     <div className="modal-overlay">
                         <div className="modal-content">
-                            <div className="modal-inner-content"> {/* Added this div for better readability */}
+                            <div className="modal-inner-content">
                                 <h3>Previous Entries</h3>
                                 <ul>
                                     {sortedEntries.map(entry => (
@@ -284,7 +344,7 @@ const HomePage = () => {
                                         </li>
                                     ))}
                                 </ul>
-                                <button onClick={toggleModal} className="modal-close-btn">Close</button>
+                                <button onClick={toggleModal} className="button">Close</button>
                             </div>
                         </div>
                     </div>
