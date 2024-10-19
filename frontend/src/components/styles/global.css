@@ -27,8 +27,8 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(1, 1, 1, 1);
-    margin-bottom: 20px;
     color: white;
+    margin-top:30px;
 }
 
 .header h2 {
@@ -86,28 +86,21 @@
 .financial-entry input,
 .financial-entry select,
 .financial-entry button {
-    margin-bottom: 10px;
-}
-
-
-
-/* Styling for the recurring cost */
-.recurring-costs {
-    color: black;
-
+    margin-bottom: 15px;
 }
 
 /* Extra containers styling */
 .extra-containers {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 200px;
     margin-top: 20px;
     color: white;
+    
 }
 
 .container-box {
-    background-color: #273A3A;
+    background-color: #2A2A2A;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(1, 1, 1, 1);
@@ -117,8 +110,9 @@
 
 /* Pie chart styling */
 .pie-chart {
-    height: 100%;
-    margin-left: 300px;
+    height: 80%;
+    margin-top: 5%;
+    margin-left: 180px;
 }
 
 .pie-chart2{
@@ -140,7 +134,7 @@
 }
 
 .modal-content {
-    background-color: #2C3E50;
+    background-color: red;
     padding: 20px;
     border-radius: 10px;
     max-width: 500px;
@@ -148,7 +142,7 @@
 }
 
 .modal-inner-content { /* New class for inner content box */
-    background-color: #34495E;
+    background-color: #3a3a3a;
     border-radius: 8px;
     padding: 15px;
 }

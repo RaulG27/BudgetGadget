@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'; // Import the CSS for the calendar
 import getUserInfo from '../../utilities/decodeJwt';
 import '../styles/global.css'; // Importing global CSS
 
@@ -21,8 +23,11 @@ const HomePage = () => {
     const [message, setMessage] = useState('');
     const [entries, setEntries] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [dailyBudget, setDailyBudget] = useState(0);Select
+    const [dailyBudget, setDailyBudget] = useState(0);
     const [todayExpenses, setTodayExpenses] = useState(0);
+    const [date, setDate] = useState(new Date());
+    const [markedDates, setMarkedDates] = useState([]);
+    const [selectedDateEntries, setSelectedDateEntries] = useState([]); // New state for modal entries
     const navigate = useNavigate();
 
     const recurringOptions = [
@@ -45,6 +50,12 @@ const HomePage = () => {
             setMessage('User not logged in. Please log in to access this page.');
         }
     }, []);
+
+    useEffect(() => {
+        // Extract dates from entries and convert to Date objects
+        const uniqueDates = Array.from(new Set(entries.map(entry => new Date(entry.date).toDateString())));
+        setMarkedDates(uniqueDates);
+    }, [entries]);
 
     const fetchDailyBudget = async (userid) => {
         try {
@@ -183,6 +194,13 @@ const HomePage = () => {
         setShowModal(!showModal);
     };
 
+    const handleDateClick = (value) => {
+        setDate(value);
+        const filteredEntries = entries.filter(entry => new Date(entry.date).toDateString() === value.toDateString());
+        setSelectedDateEntries(filteredEntries); // Set entries for the selected date
+        toggleModal(); // Open modal
+    };
+
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
     // Prepare data for the first pie chart (Daily Budget vs. Today Expenses)
@@ -191,8 +209,8 @@ const HomePage = () => {
         datasets: [
             {
                 data: [dailyBudget, todayExpenses],
-                backgroundColor: ['#3498DB', '#E74C3C'], // Blue and Red
-                hoverBackgroundColor: ['#2980B9', '#C0392B'], // Darker shades for hover
+                backgroundColor: ['#2980B9', '#C0392B'], // Blue and Red
+                hoverBackgroundColor:['#3498DB', '#E74C3C'] , // Darker shades for hover
             },
         ],
     };
@@ -228,7 +246,11 @@ const HomePage = () => {
             },
         ],
     };
-    
+
+    const tileClassName = ({ date }) => {
+        const dateString = date.toDateString();
+        return markedDates.includes(dateString) ? 'highlight' : null; // Highlight marked dates
+    };
 
     return (
         <div className="background-container">
@@ -303,46 +325,57 @@ const HomePage = () => {
                 </div>
 
                 <div className="content">
-                        <div className="chart-container">
-                            <h3>Spending by Category:</h3>
-                            <div className="pie-chart2">
-                                <Pie 
-                                    data={pieChart2Data} 
-                                    options={{
-                                        maintainAspectRatio: true, responsive: true,
-                                        plugins: {
-                                            legend: { display: true, position: 'left', labels:{color:'white'} },
-                                        },
-                                    }} 
-                                />
-                            </div>
+                    <div className="chart-container">
+                        <h3>Spending by Category:</h3>
+                        <div className="pie-chart2">
+                            <Pie 
+                                data={pieChart2Data} 
+                                options={{
+                                    maintainAspectRatio: true, responsive: true,
+                                    plugins: {
+                                        legend: { display: true, position: 'left', labels:{color:'white'} },
+                                    },
+                                }} 
+                            />
                         </div>
-                    
-                    <div className="chart-container">Container 4</div> {/* Moved Container 4 here */}
-                    
+                    </div>
+                    <div className="chart-container">                    
+                        <div className="calendar-container">
+                        <h3>Your Financial Entries</h3>
+                        <h3>By Date</h3>
+                        <Calendar
+                            onChange={handleDateClick} // Use handleDateClick to open modal
+                            value={date}
+                            tileClassName={tileClassName}
+                        />
+                        </div>
+                    </div>
+                    <div className="chart-container">Container 5</div>
                 </div>
+
                 <div className="extra-containers">
-                    <div className="container-box">Container 5</div>
                     <div className="container-box">Container 6</div>
                     <div className="container-box">Container 7</div>
                     <div className="container-box">Container 8</div>
                 </div>
+
                 {showModal && (
                     <div className="modal-overlay">
                         <div className="modal-content">
                             <div className="modal-inner-content">
-                                <h3>Previous Entries</h3>
+                                <h3>Entries for {date.toDateString()}</h3>
                                 <ul>
-                                    {sortedEntries.map(entry => (
-                                        <li key={entry._id} className="entry-item">
-                                            <span>
-                                                {entry.type}: ${entry.amount} on {new Date(entry.date).toLocaleDateString()}
-                                            </span>
-                                            <span className="entry-comments">
-                                                {entry.comments}
-                                            </span>
-                                        </li>
-                                    ))}
+                                    {selectedDateEntries.length > 0 ? (
+                                        selectedDateEntries.map(entry => (
+                                            <li key={entry._id} className="entry-item">
+                                                <span>
+                                                    {entry.type}: ${entry.amount} - {entry.comments}
+                                                </span>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li>No entries for this date.</li>
+                                    )}
                                 </ul>
                                 <button onClick={toggleModal} className="button">Close</button>
                             </div>
