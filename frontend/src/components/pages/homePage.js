@@ -209,11 +209,13 @@ const HomePage = () => {
         datasets: [
             {
                 data: [dailyBudget, todayExpenses],
-                backgroundColor: ['#2980B9', '#C0392B'], // Blue and Red
-                hoverBackgroundColor:['#3498DB', '#E74C3C'] , // Darker shades for hover
+                backgroundColor: ['#007BFF', '#FF3B30'], // Bright Blue and Bright Red
+                hoverBackgroundColor: ['#0056b3', '#D52B1E'], // Darker shades for hover
             },
         ],
     };
+    
+    
 
     // Prepare data for the second pie chart (Spending by Category)
     const categoryTotals = {
@@ -241,11 +243,12 @@ const HomePage = () => {
         datasets: [
             {
                 data: Object.values(categoryTotals),
-                backgroundColor: ['#3498DB', '#E74C3C', '#F1C40F', '#2ECC71', '#9B59B6', '#34495E', '#E67E22'], // Different colors for each category
-                hoverBackgroundColor: ['#2980B9', '#C0392B', '#F39C12', '#27AE60', '#8E44AD', '#2C3E50', '#D35400'], // Darker shades for hover
+                backgroundColor: ['#4A90E2', '#E94E77', '#F6BB3B', '#2ECC71', '#9B59B6', '#F39C12', '#BDC3C7'], // Light Blue, Coral Red, Golden Yellow, Mint Green, Lavender Purple, Orange, Light Gray
+                hoverBackgroundColor: ['#357ABD', '#D53B68', '#D19A00', '#28B463', '#7D3C98', '#D97A24', '#A2A2A2'], // Darker shades for hover
             },
         ],
     };
+    
 
     const tileClassName = ({ date }) => {
         const dateString = date.toDateString();
@@ -280,48 +283,84 @@ const HomePage = () => {
                                                             } />
                         </div>
                     </div>
-                    <div className="financial-entry">
-                        <h3>Add Financial Entry</h3>
-                        <form onSubmit={handleSubmit}>
-                            <input
-                                type="number"
-                                name="amount"
-                                placeholder="Amount"
-                                value={formData.amount}
-                                onChange={handleChange}
-                                required
-                            />
-                            <select
-                                name="type"
-                                value={formData.type}
-                                onChange={handleChange}
-                            >
-                                <option value="income">Income</option>
-                                <option value="expense">Expense</option>
-                            </select>
-                            <input
-                                type="text"
-                                name="comments"
-                                placeholder="Comments"
-                                value={formData.comments}
-                                onChange={handleChange}
-                            />
-                            <div className="recurring-costs">
-                                <Select
-                                    isMulti
-                                    name="recurring_cost"
-                                    options={recurringOptions}
-                                    className="basic-multi-select"
-                                    classNamePrefix="select"
-                                    value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
-                                    onChange={handleRecurringCostChange}
-                                />
-                            </div>
-                            <button type="submit" className="button">Add Entry</button>
-                        </form>
-                        {message && <p>{message}</p>}
-                        <button onClick={toggleModal} className="button">All Entries</button>
-                    </div>
+
+                    <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+    <h3 className="text-xl font-semibold mb-4">Add Financial Entry</h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+            type="number"
+            name="amount"
+            placeholder="Amount"
+            value={formData.amount}
+            onChange={handleChange}
+            required
+            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <select
+            name="type"
+            value={formData.type}
+            onChange={handleChange}
+            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+        <input
+            type="text"
+            name="comments"
+            placeholder="Comments"
+            value={formData.comments}
+            onChange={handleChange}
+            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+<div className="recurring-costs">
+    <Select
+        isMulti
+        name="recurring_cost"
+        options={recurringOptions}
+        className="basic-multi-select"
+        classNamePrefix="select"
+        value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
+        onChange={handleRecurringCostChange}
+        styles={{
+            option: (provided) => ({
+                ...provided,
+                color: 'black', // Set option text color to black
+            }),
+            control: (provided) => ({
+                ...provided,
+                backgroundColor: 'white', // Background color for the control
+                borderColor: '#2a2a2a', // Optional: border color to match your design
+                boxShadow: 'none', // Remove box shadow
+                '&:hover': {
+                    borderColor: '#007BFF', // Optional: border color on hover
+                },
+            }),
+            multiValue: (provided) => ({
+                ...provided,
+                backgroundColor: '#007BFF', // Background color for selected values
+                color: 'white', // Text color for selected values
+            }),
+            multiValueLabel: (provided) => ({
+                ...provided,
+                color: 'white', // Text color for selected values
+            }),
+            multiValueRemove: (provided) => ({
+                ...provided,
+                color: 'white', // Icon color for removing selected values
+                '&:hover': {
+                    color: '#FF3B30', // Icon color on hover
+                },
+            }),
+        }}
+    />
+</div>
+        <button type="submit" className="button">Add Entry</button>
+    </form>
+    {message && <p className="mt-2 text-green-400">{message}</p>}
+    <button onClick={toggleModal} className="button">All Entries</button>
+</div>
+
                 </div>
 
                 <div className="content">
@@ -341,8 +380,8 @@ const HomePage = () => {
                     </div>
                     <div className="chart-container">                    
                         <div className="calendar-container">
-                        <h3>Your Financial Entries</h3>
-                        <h3>By Date</h3>
+                        <h3>Financial Entries By Date</h3>
+            
                         <Calendar
                             onChange={handleDateClick} // Use handleDateClick to open modal
                             value={date}

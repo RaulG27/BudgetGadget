@@ -28,40 +28,86 @@ const Navbar = () => {
   return (
     <>
       <div className="navbar">
-        <a href="/" style={getLinkStyle('/')} >
+        <a href="/" style={getLinkStyle('/')} className="nav-link">
           <CiLogin style={iconStyles} />
+          <span className="nav-text">Login/Sign-up</span>
         </a>
-        <a href="/home" style={getLinkStyle('/home')} >
+        <a href="/home" style={getLinkStyle('/home')} className="nav-link">
           <FaHome style={iconStyles} />
+          <span className="nav-text">Home</span>
         </a>
-        <a href="/privateUserProfile" style={getLinkStyle('/privateUserProfile')} >
+        <a href="/privateUserProfile" style={getLinkStyle('/privateUserProfile')} className="nav-link">
           <FaUser style={iconStyles} />
+          <span className="nav-text">Profile</span>
         </a>
-        <a href="https://github.com/RaulG27/BudgetGadget">
+        <a href="https://github.com/RaulG27/BudgetGadget" className="nav-link">
           <FaGithub style={iconStyles} />
+          <span className="nav-text">GitHub</span>
         </a>
       </div>
 
       <style jsx>{`
         .navbar {
           position: fixed;
-          left: 0;
-          right: 0;
-          background-color: #1a1a1a;
           display: flex;
           justify-content: space-around;
-          padding: 10px 0;
+          background-color: #333333;
+          padding: 10px;
           box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.5);
           z-index: 1000;
         }
-        @media (min-width: 768px) { /* Adjust this breakpoint as needed */
+
+        .nav-link {
+          display: flex;
+          align-items: center;
+          color: white;
+          text-decoration: none;
+          padding: 10px;
+        }
+
+        .nav-text {
+          display: none;
+          margin-left: 10px;
+          font-size: 16px;
+        }
+
+        @media (min-width: 768px) {
           .navbar {
-            top: 0; /* Position at the top for desktop */
+            top: 0;
+            bottom: auto;
+            left: 0;
+            flex-direction: column;
+            height: 100vh;
+            width: 200px;
+            padding: 20px 0;
+            justify-content: flex-start;
+            align-items: flex-start;
+          }
+
+          .nav-link {
+            justify-content: flex-start;
+            width: 100%;
+            padding: 15px;
+          }
+
+          .nav-text {
+            display: inline-block;
           }
         }
-        @media (max-width: 768px) { /* Adjust this breakpoint as needed */
+
+        @media (max-width: 767px) {
           .navbar {
-            bottom: 0; /* Position at the bottom for mobile */
+            bottom: 0;
+            top: auto;
+            left: 0;
+            right: 0;
+            height: 60px;
+            flex-direction: row;
+            justify-content: space-around;
+          }
+
+          .nav-text {
+            display: none;
           }
         }
       `}</style>
