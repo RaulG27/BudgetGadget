@@ -32,6 +32,7 @@ const HomePage = () => {
     const [selectedDateEntries, setSelectedDateEntries] = useState([]); // New state for modal entries
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState(new Date()); // New state for date picker
+    const [upcomingExpenses, setUpcomingExpenses] = useState([]);
 
     const recurringOptions = [
         { value: 'Housing', label: 'Housing' },
@@ -89,12 +90,21 @@ const HomePage = () => {
             if (response.ok) {
                 setEntries(data);
                 calculateTodayExpenses(data);
+                filterUpcomingExpenses(data);
             } else {
                 console.error('Error fetching entries:', data);
             }
         } catch (error) {
             console.error('Error fetching entries:', error);
         }
+    };
+
+    const filterUpcomingExpenses = (entries) => {
+        const today = new Date();
+        const upcoming = entries.filter(entry => 
+            entry.type === 'expense' && new Date(entry.date) > today
+        );
+        setUpcomingExpenses(upcoming);
     };
 
     const calculateTodayExpenses = (entries) => {
@@ -202,6 +212,16 @@ const HomePage = () => {
         setSelectedDateEntries(filteredEntries); // Set entries for the selected date
         toggleModal(); // Open modal
     }; 
+
+        const handleTodayClick = () => {
+        const today = new Date();
+        const filteredEntries = entries.filter(entry => 
+            new Date(entry.date).toDateString() === today.toDateString()
+        );
+        setSelectedDateEntries(filteredEntries);
+        setSelectedDate(today);
+        toggleModal();
+    };
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
@@ -374,7 +394,7 @@ const HomePage = () => {
         <button type="submit" className="button">Add Entry</button>
     </form>
     {message && <p className="mt-2 text-green-400">{message}</p>}
-    <button onClick={toggleModal} className="button">All Entries</button>
+    <button onClick={handleTodayClick} className="button">All Entries</button>
 </div>
 
                 </div>
@@ -405,7 +425,22 @@ const HomePage = () => {
                         />
                         </div>
                     </div>
-                    <div className="chart-container">Container 5</div>
+                    <div className="chart-container">
+    <h3>Upcoming Expenses</h3>
+    <ul>
+        {upcomingExpenses.length > 0 ? (
+            upcomingExpenses.map(expense => (
+                <li key={expense._id} className="entry-item">
+                    <span>
+                        ${expense.amount} - {expense.comments} on {new Date(expense.date).toLocaleDateString()}
+                    </span>
+                </li>
+            ))
+        ) : (
+            <li>No upcoming expenses.</li>
+        )}
+    </ul>
+</div>
                 </div>
 
                 <div className="extra-containers">
