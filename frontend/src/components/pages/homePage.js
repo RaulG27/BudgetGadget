@@ -5,6 +5,8 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; // Import the CSS for the calendar
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css'; // Import the CSS
 import getUserInfo from '../../utilities/decodeJwt';
 import '../styles/global.css'; // Importing global CSS
 
@@ -29,6 +31,7 @@ const HomePage = () => {
     const [markedDates, setMarkedDates] = useState([]);
     const [selectedDateEntries, setSelectedDateEntries] = useState([]); // New state for modal entries
     const navigate = useNavigate();
+    const [selectedDate, setSelectedDate] = useState(new Date()); // New state for date picker
 
     const recurringOptions = [
         { value: 'Housing', label: 'Housing' },
@@ -149,7 +152,7 @@ const HomePage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { amount, type, comments, recurring_cost } = formData;
-
+    
         const validRecurringCosts = [
             'Housing', 'Utilities', 'Food',
             'Entertainment', 'Savings', 'Transportation',
@@ -160,7 +163,6 @@ const HomePage = () => {
             setMessage(`Invalid recurring cost(s): ${invalidCosts.join(', ')}`);
             return;
         }
-
         try {
             const response = await fetch('http://localhost:8081/user/entries', {
                 method: 'POST',
@@ -169,12 +171,12 @@ const HomePage = () => {
                     userid: user.id,
                     amount: Number(amount),
                     type,
-                    date: new Date().toISOString(),
+                    date: selectedDate.toISOString(), // Use the selected date for future entries
                     comments,
                     recurring_cost,
                 }),
             });
-
+    
             const data = await response.json();
             if (response.ok) {
                 setMessage('Entry added successfully!');
@@ -195,11 +197,11 @@ const HomePage = () => {
     };
 
     const handleDateClick = (value) => {
-        setDate(value);
+        setSelectedDate(value); // Set the selected date for future entry
         const filteredEntries = entries.filter(entry => new Date(entry.date).toDateString() === value.toDateString());
         setSelectedDateEntries(filteredEntries); // Set entries for the selected date
         toggleModal(); // Open modal
-    };
+    }; 
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
@@ -284,7 +286,7 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+               <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
     <h3 className="text-xl font-semibold mb-4">Add Financial Entry</h3>
     <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -305,6 +307,20 @@ const HomePage = () => {
             <option value="income">Income</option>
             <option value="expense">Expense</option>
         </select>
+        <div className="date-picker relative">
+    <label htmlFor="date" className="block text-sm font-semibold mb-1">Date: </label>
+    <p></p>
+    <DatePicker
+        selected={selectedDate}
+        onChange={(date) => setSelectedDate(date)}
+        dateFormat="yyyy-MM-dd"
+        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-md hover:shadow-lg"
+        // Add a custom calendar class for more specific styles
+        calendarClassName="custom-datepicker"
+        // Optionally add a custom input class for additional styling
+        wrapperClassName="datepicker-wrapper"
+    />
+</div>
         <input
             type="text"
             name="comments"
@@ -313,48 +329,48 @@ const HomePage = () => {
             onChange={handleChange}
             className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-<div className="recurring-costs">
-    <Select
-        isMulti
-        name="recurring_cost"
-        options={recurringOptions}
-        className="basic-multi-select"
-        classNamePrefix="select"
-        value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
-        onChange={handleRecurringCostChange}
-        styles={{
-            option: (provided) => ({
-                ...provided,
-                color: 'black', // Set option text color to black
-            }),
-            control: (provided) => ({
-                ...provided,
-                backgroundColor: 'white', // Background color for the control
-                borderColor: '#2a2a2a', // Optional: border color to match your design
-                boxShadow: 'none', // Remove box shadow
-                '&:hover': {
-                    borderColor: '#007BFF', // Optional: border color on hover
-                },
-            }),
-            multiValue: (provided) => ({
-                ...provided,
-                backgroundColor: '#007BFF', // Background color for selected values
-                color: 'white', // Text color for selected values
-            }),
-            multiValueLabel: (provided) => ({
-                ...provided,
-                color: 'white', // Text color for selected values
-            }),
-            multiValueRemove: (provided) => ({
-                ...provided,
-                color: 'white', // Icon color for removing selected values
-                '&:hover': {
-                    color: '#FF3B30', // Icon color on hover
-                },
-            }),
-        }}
-    />
-</div>
+        <div className="recurring-costs">
+            <Select
+                isMulti
+                name="recurring_cost"
+                options={recurringOptions}
+                className="basic-multi-select"
+                classNamePrefix="select"
+                value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
+                onChange={handleRecurringCostChange}
+                styles={{
+                    option: (provided) => ({
+                        ...provided,
+                        color: 'black',
+                    }),
+                    control: (provided) => ({
+                        ...provided,
+                        backgroundColor: 'white',
+                        borderColor: '#2a2a2a',
+                        boxShadow: 'none',
+                        '&:hover': {
+                            borderColor: '#007BFF',
+                        },
+                    }),
+                    multiValue: (provided) => ({
+                        ...provided,
+                        backgroundColor: '#007BFF',
+                        color: 'white',
+                    }),
+                    multiValueLabel: (provided) => ({
+                        ...provided,
+                        color: 'white',
+                    }),
+                    multiValueRemove: (provided) => ({
+                        ...provided,
+                        color: 'white',
+                        '&:hover': {
+                            color: '#FF3B30',
+                        },
+                    }),
+                }}
+            />
+        </div>
         <button type="submit" className="button">Add Entry</button>
     </form>
     {message && <p className="mt-2 text-green-400">{message}</p>}
@@ -399,28 +415,28 @@ const HomePage = () => {
                 </div>
 
                 {showModal && (
-                    <div className="modal-overlay">
-                        <div className="modal-content">
-                            <div className="modal-inner-content">
-                                <h3>Entries for {date.toDateString()}</h3>
-                                <ul>
-                                    {selectedDateEntries.length > 0 ? (
-                                        selectedDateEntries.map(entry => (
-                                            <li key={entry._id} className="entry-item">
-                                                <span>
-                                                    {entry.type}: ${entry.amount} - {entry.comments}
-                                                </span>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li>No entries for this date.</li>
-                                    )}
-                                </ul>
-                                <button onClick={toggleModal} className="button">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+    <div className="modal-overlay">
+        <div className="modal-content">
+            <div className="modal-inner-content">
+                <h3>Entries for {selectedDate.toDateString()}</h3> {/* Use selectedDate instead of date */}
+                <ul>
+                    {selectedDateEntries.length > 0 ? (
+                        selectedDateEntries.map(entry => (
+                            <li key={entry._id} className="entry-item">
+                                <span>
+                                    {entry.type}: ${entry.amount} - {entry.comments}
+                                </span>
+                            </li>
+                        ))
+                    ) : (
+                        <li>No entries for this date.</li>
+                    )}
+                </ul>
+                <button onClick={toggleModal} className="button">Close</button>
+            </div>
+        </div>
+    </div>
+)}
             </div>
         </div>
     );
