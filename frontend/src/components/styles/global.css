@@ -200,6 +200,18 @@
     .container-box {
         flex: 1 1 100%; /* Full width for each box on small screens */
     }
+
+    .sidebar {
+        width: 50px; /* Narrower width for mobile */
+    }
+
+    .sidebar:hover {
+        width: 200px; /* Adjusted hover width for mobile */
+    }
+
+    .crypto-list {
+        padding: 10px; /* Reduced padding for mobile */
+    }
 }
 
 @media (max-width: 480px) {
@@ -216,4 +228,105 @@
     padding: 5px 10px;
     cursor: pointer;
     color:white;
+}
+
+/* Sidebar styling */
+.sidebar, .sidebar2 {
+    position: fixed;
+    width: 50%; /* Occupy half of the space each */
+    background-color: #333333;
+    color: white;
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    z-index: 998; /* Ensure navbar is on top */
+    border-radius: 10px; /* Rounded borders */
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #888 #333; /* Firefox */
+    opacity: 0.5; /* Partially visible by default */
+    height: 50px; /* Initial small height */
+    bottom: 0; /* Align to the bottom by default */
+}
+
+@media (max-width: 768px) {
+    .sidebar, .sidebar2 {
+        top: 0; /* Align to the top on mobile */
+        bottom: auto; /* Remove bottom alignment on mobile */
+    }
+
+    .sidebar:hover, .sidebar2:hover {
+        height: 300px; /* Expanded height on hover, opens downwards */
+        opacity: 1; /* Fully visible on hover */
+    }
+}
+
+@media (min-width: 769px) {
+    .sidebar, .sidebar2 {
+        bottom: 0; /* Align to the bottom on browser */
+        top: auto; /* Remove top alignment on browser */
+    }
+
+    .sidebar:hover, .sidebar2:hover {
+        height: 300px; /* Expanded height on hover, opens upwards */
+        opacity: 1; /* Fully visible on hover */
+    }
+}
+
+.sidebar::-webkit-scrollbar, .sidebar2::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.sidebar::-webkit-scrollbar-track, .sidebar2::-webkit-scrollbar-track {
+    background: #333; /* Track color */
+    border-radius: 10px; /* Rounded track */
+}
+
+.sidebar::-webkit-scrollbar-thumb, .sidebar2::-webkit-scrollbar-thumb {
+    background-color: #888; /* Scrollbar color */
+    border-radius: 10px; /* Rounded scrollbar */
+    border: 2px solid #333; /* Padding around scrollbar */
+}
+
+.sidebar {
+    left: 0; /* Align to the left */
+}
+
+.sidebar2 {
+    left: 50%; /* Align next to the first sidebar */
+}
+
+.crypto-list, .stock-list {
+    padding: 20px;
+    opacity: 1; /* Make the title visible by default */
+    transition: opacity 0.3s ease;
+    max-height: 20px; /* Limit height to show only the title */
+    overflow: hidden; /* Hide overflow content */
+}
+
+.sidebar:hover .crypto-list, .sidebar2:hover .stock-list {
+    opacity: 1; /* Visible on hover */
+    max-height: none; /* Remove height restriction on hover */
+}
+
+.crypto-list h3, .stock-list h3 {
+    margin-top: 0;
+}
+
+.crypto-list ul, .stock-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.crypto-list li, .stock-list li {
+    margin-bottom: 10px;
+}
+
+.crypto-list button, .stock-list button {
+    margin-top: 5px;
+    background-color: #1E90FF;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    color: white;
 }

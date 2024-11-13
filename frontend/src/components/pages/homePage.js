@@ -4,11 +4,13 @@ import Select from 'react-select';
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; // Import the CSS for the calendar
+import 'react-calendar/dist/Calendar.css';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css'; // Import the CSS
+import 'react-datepicker/dist/react-datepicker.css';
 import getUserInfo from '../../utilities/decodeJwt';
-import '../styles/global.css'; // Importing global CSS
+import '../styles/global.css';
+import PopularCrypto from '../PopularCrypto';
+import PopularStock from '../PopularStock';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -29,10 +31,11 @@ const HomePage = () => {
     const [todayExpenses, setTodayExpenses] = useState(0);
     const [date, setDate] = useState(new Date());
     const [markedDates, setMarkedDates] = useState([]);
-    const [selectedDateEntries, setSelectedDateEntries] = useState([]); // New state for modal entries
+    const [selectedDateEntries, setSelectedDateEntries] = useState([]);
     const navigate = useNavigate();
-    const [selectedDate, setSelectedDate] = useState(new Date()); // New state for date picker
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [upcomingExpenses, setUpcomingExpenses] = useState([]);
+    const apiKey = process.env.REACT_APP_TWELVE_DATA_API_KEY;
 
     const recurringOptions = [
         { value: 'Housing', label: 'Housing' },
@@ -56,7 +59,6 @@ const HomePage = () => {
     }, []);
 
     useEffect(() => {
-        // Extract dates from entries and convert to Date objects
         const uniqueDates = Array.from(new Set(entries.map(entry => new Date(entry.date).toDateString())));
         setMarkedDates(uniqueDates);
     }, [entries]);
@@ -181,7 +183,7 @@ const HomePage = () => {
                     userid: user.id,
                     amount: Number(amount),
                     type,
-                    date: selectedDate.toISOString(), // Use the selected date for future entries
+                    date: selectedDate.toISOString(),
                     comments,
                     recurring_cost,
                 }),
@@ -207,13 +209,13 @@ const HomePage = () => {
     };
 
     const handleDateClick = (value) => {
-        setSelectedDate(value); // Set the selected date for future entry
+        setSelectedDate(value);
         const filteredEntries = entries.filter(entry => new Date(entry.date).toDateString() === value.toDateString());
-        setSelectedDateEntries(filteredEntries); // Set entries for the selected date
-        toggleModal(); // Open modal
+        setSelectedDateEntries(filteredEntries);
+        toggleModal();
     }; 
 
-        const handleTodayClick = () => {
+    const handleTodayClick = () => {
         const today = new Date();
         const filteredEntries = entries.filter(entry => 
             new Date(entry.date).toDateString() === today.toDateString()
@@ -225,21 +227,17 @@ const HomePage = () => {
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    // Prepare data for the first pie chart (Daily Budget vs. Today Expenses)
     const pieChart1Data = {
         labels: ['Daily Budget', 'Spent Today'],
         datasets: [
             {
                 data: [dailyBudget, todayExpenses],
-                backgroundColor: ['#007BFF', '#FF3B30'], // Bright Blue and Bright Red
-                hoverBackgroundColor: ['#0056b3', '#D52B1E'], // Darker shades for hover
+                backgroundColor: ['#007BFF', '#FF3B30'],
+                hoverBackgroundColor: ['#0056b3', '#D52B1E'],
             },
         ],
     };
     
-    
-
-    // Prepare data for the second pie chart (Spending by Category)
     const categoryTotals = {
         Housing: 0,
         Utilities: 0,
@@ -265,16 +263,15 @@ const HomePage = () => {
         datasets: [
             {
                 data: Object.values(categoryTotals),
-                backgroundColor: ['#4A90E2', '#E94E77', '#F6BB3B', '#2ECC71', '#9B59B6', '#F39C12', '#BDC3C7'], // Light Blue, Coral Red, Golden Yellow, Mint Green, Lavender Purple, Orange, Light Gray
-                hoverBackgroundColor: ['#357ABD', '#D53B68', '#D19A00', '#28B463', '#7D3C98', '#D97A24', '#A2A2A2'], // Darker shades for hover
+                backgroundColor: ['#4A90E2', '#E94E77', '#F6BB3B', '#2ECC71', '#9B59B6', '#F39C12', '#BDC3C7'],
+                hoverBackgroundColor: ['#357ABD', '#D53B68', '#D19A00', '#28B463', '#7D3C98', '#D97A24', '#A2A2A2'],
             },
         ],
     };
     
-
     const tileClassName = ({ date }) => {
         const dateString = date.toDateString();
-        return markedDates.includes(dateString) ? 'highlight' : null; // Highlight marked dates
+        return markedDates.includes(dateString) ? 'highlight' : null;
     };
 
     return (
@@ -306,97 +303,94 @@ const HomePage = () => {
                         </div>
                     </div>
 
-               <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
-    <h3 className="text-xl font-semibold mb-4">Add Financial Entry</h3>
-    <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-            type="number"
-            name="amount"
-            placeholder="Amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-        </select>
-        <div className="date-picker relative">
-    <label htmlFor="date" className="block text-sm font-semibold mb-1">Date: </label>
-    <p></p>
-    <DatePicker
-        selected={selectedDate}
-        onChange={(date) => setSelectedDate(date)}
-        dateFormat="yyyy-MM-dd"
-        className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-md hover:shadow-lg"
-        // Add a custom calendar class for more specific styles
-        calendarClassName="custom-datepicker"
-        // Optionally add a custom input class for additional styling
-        wrapperClassName="datepicker-wrapper"
-    />
-</div>
-        <input
-            type="text"
-            name="comments"
-            placeholder="Comments"
-            value={formData.comments}
-            onChange={handleChange}
-            className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="recurring-costs">
-            <Select
-                isMulti
-                name="recurring_cost"
-                options={recurringOptions}
-                className="basic-multi-select"
-                classNamePrefix="select"
-                value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
-                onChange={handleRecurringCostChange}
-                styles={{
-                    option: (provided) => ({
-                        ...provided,
-                        color: 'black',
-                    }),
-                    control: (provided) => ({
-                        ...provided,
-                        backgroundColor: 'white',
-                        borderColor: '#2a2a2a',
-                        boxShadow: 'none',
-                        '&:hover': {
-                            borderColor: '#007BFF',
-                        },
-                    }),
-                    multiValue: (provided) => ({
-                        ...provided,
-                        backgroundColor: '#007BFF',
-                        color: 'white',
-                    }),
-                    multiValueLabel: (provided) => ({
-                        ...provided,
-                        color: 'white',
-                    }),
-                    multiValueRemove: (provided) => ({
-                        ...provided,
-                        color: 'white',
-                        '&:hover': {
-                            color: '#FF3B30',
-                        },
-                    }),
-                }}
-            />
-        </div>
-        <button type="submit" className="button">Add Entry</button>
-    </form>
-    {message && <p className="mt-2 text-green-400">{message}</p>}
-    <button onClick={handleTodayClick} className="button">All Entries</button>
-</div>
-
+                    <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
+                        <h3 className="text-xl font-semibold mb-4">Add Financial Entry</h3>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <input
+                                type="number"
+                                name="amount"
+                                placeholder="Amount"
+                                value={formData.amount}
+                                onChange={handleChange}
+                                required
+                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <select
+                                name="type"
+                                value={formData.type}
+                                onChange={handleChange}
+                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="income">Income</option>
+                                <option value="expense">Expense</option>
+                            </select>
+                            <div className="date-picker relative">
+                                <label htmlFor="date" className="block text-sm font-semibold mb-1">Date: </label>
+                                <p></p>
+                                <DatePicker
+                                    selected={selectedDate}
+                                    onChange={(date) => setSelectedDate(date)}
+                                    dateFormat="yyyy-MM-dd"
+                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-md hover:shadow-lg"
+                                    calendarClassName="custom-datepicker"
+                                    wrapperClassName="datepicker-wrapper"
+                                />
+                            </div>
+                            <input
+                                type="text"
+                                name="comments"
+                                placeholder="Comments"
+                                value={formData.comments}
+                                onChange={handleChange}
+                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                            <div className="recurring-costs">
+                                <Select
+                                    isMulti
+                                    name="recurring_cost"
+                                    options={recurringOptions}
+                                    className="basic-multi-select"
+                                    classNamePrefix="select"
+                                    value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
+                                    onChange={handleRecurringCostChange}
+                                    styles={{
+                                        option: (provided) => ({
+                                            ...provided,
+                                            color: 'black',
+                                        }),
+                                        control: (provided) => ({
+                                            ...provided,
+                                            backgroundColor: 'white',
+                                            borderColor: '#2a2a2a',
+                                            boxShadow: 'none',
+                                            '&:hover': {
+                                                borderColor: '#007BFF',
+                                            },
+                                        }),
+                                        multiValue: (provided) => ({
+                                            ...provided,
+                                            backgroundColor: '#007BFF',
+                                            color: 'white',
+                                        }),
+                                        multiValueLabel: (provided) => ({
+                                            ...provided,
+                                            color: 'white',
+                                        }),
+                                        multiValueRemove: (provided) => ({
+                                            ...provided,
+                                            color: 'white',
+                                            '&:hover': {
+                                                color: '#FF3B30',
+                                            },
+                                        }),
+                                    }}
+                                />
+                            </div>
+                            <button type="submit" className="button">Add Entry</button>
+                        </form>
+                        {message && <p className="mt-2 text-green-400">{message}</p>}
+                        <button onClick={handleTodayClick} className="button">All Entries</button>
+                    </div>
                 </div>
 
                 <div className="content">
@@ -416,62 +410,60 @@ const HomePage = () => {
                     </div>
                     <div className="chart-container">                    
                         <div className="calendar-container">
-                        <h3>Financial Entries By Date</h3>
-            
-                        <Calendar
-                            onChange={handleDateClick} // Use handleDateClick to open modal
-                            value={date}
-                            tileClassName={tileClassName}
-                        />
+                            <h3>Financial Entries By Date</h3>
+                            <Calendar
+                                onChange={handleDateClick}
+                                value={date}
+                                tileClassName={tileClassName}
+                            />
                         </div>
                     </div>
                     <div className="chart-container">
-    <h3>Upcoming Expenses</h3>
-    <ul>
-        {upcomingExpenses.length > 0 ? (
-            upcomingExpenses.map(expense => (
-                <li key={expense._id} className="entry-item">
-                    <span>
-                        ${expense.amount} - {expense.comments} on {new Date(expense.date).toLocaleDateString()}
-                    </span>
-                </li>
-            ))
-        ) : (
-            <li>No upcoming expenses.</li>
-        )}
-    </ul>
-</div>
+                        <h3>Upcoming Expenses</h3>
+                        <ul>
+                            {upcomingExpenses.length > 0 ? (
+                                upcomingExpenses.map(expense => (
+                                    <li key={expense._id} className="entry-item">
+                                        <span>
+                                            ${expense.amount} - {expense.comments} on {new Date(expense.date).toLocaleDateString()}
+                                        </span>
+                                    </li>
+                                ))
+                            ) : (
+                                <li>No upcoming expenses.</li>
+                            )}
+                        </ul>
+                    </div>
                 </div>
 
                 <div className="extra-containers">
-                    <div className="container-box">Container 6</div>
-                    <div className="container-box">Container 7</div>
-                    <div className="container-box">Container 8</div>
                 </div>
 
                 {showModal && (
-    <div className="modal-overlay">
-        <div className="modal-content">
-            <div className="modal-inner-content">
-                <h3>Entries for {selectedDate.toDateString()}</h3> {/* Use selectedDate instead of date */}
-                <ul>
-                    {selectedDateEntries.length > 0 ? (
-                        selectedDateEntries.map(entry => (
-                            <li key={entry._id} className="entry-item">
-                                <span>
-                                    {entry.type}: ${entry.amount} - {entry.comments}
-                                </span>
-                            </li>
-                        ))
-                    ) : (
-                        <li>No entries for this date.</li>
-                    )}
-                </ul>
-                <button onClick={toggleModal} className="button">Close</button>
-            </div>
-        </div>
-    </div>
-)}
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <div className="modal-inner-content">
+                                <h3>Entries for {selectedDate.toDateString()}</h3>
+                                <ul>
+                                    {selectedDateEntries.length > 0 ? (
+                                        selectedDateEntries.map(entry => (
+                                            <li key={entry._id} className="entry-item">
+                                                <span>
+                                                    {entry.type}: ${entry.amount} - {entry.comments}
+                                                </span>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li>No entries for this date.</li>
+                                    )}
+                                </ul>
+                                <button onClick={toggleModal} className="button">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                <PopularCrypto apiKey={apiKey} userId={user.id} />
+                <PopularStock userId={user.id} />
             </div>
         </div>
     );

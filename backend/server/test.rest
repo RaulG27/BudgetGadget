@@ -36,3 +36,18 @@ Content-Type: application/json
     "userid": "66e7cc598ba469d6a4400983",
     "amount": 50
 }
+
+####
+GET http://localhost:8095/likes/view-likes/66fb88b59efc25f2aaf83053
+Content-Type: application/json
+
+{
+        "_id": "like_id",
+        "userId": {
+            "_id": "user_id",
+            "username": "ExampleUser",
+            "profileImage": "https://example.com/image.jpg"
+        },
+        "postId": "post_id",
+        "date": "2024-10-01T06:40:22.117Z"
+}
