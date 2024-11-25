@@ -11,6 +11,7 @@ import getUserInfo from '../../utilities/decodeJwt';
 import '../styles/global.css';
 import PopularCrypto from '../PopularCrypto';
 import PopularStock from '../PopularStock';
+import TextField from '@mui/material/TextField';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
@@ -232,8 +233,8 @@ const HomePage = () => {
         datasets: [
             {
                 data: [dailyBudget, todayExpenses],
-                backgroundColor: ['#007BFF', '#FF3B30'],
-                hoverBackgroundColor: ['#0056b3', '#D52B1E'],
+                backgroundColor: ['#A8D5BA', '#FFE08A'],       // Washed-Out Green and Washed-Out Yellow
+hoverBackgroundColor: ['#8BBF9E', '#E0C572'],  // Slightly Darker Green and Yellow for Hover
             },
         ],
     };
@@ -303,47 +304,63 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    <div className="financial-entry bg-gray-800 p-6 rounded-lg shadow-lg text-white">
-                        <h3 className="text-xl font-semibold mb-4">Add Financial Entry</h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <input
-                                type="number"
-                                name="amount"
-                                placeholder="Amount"
-                                value={formData.amount}
-                                onChange={handleChange}
-                                required
-                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                    <div className="financial-entry bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+                        <h3 className="text-2xl font-bold mb-6">Add Financial Entry</h3>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+
+                        <TextField
+    required
+    id="outlined-required"
+    label="Enter Amount"
+    value={formData.amount}
+    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+    variant="outlined"
+    fullWidth
+    InputProps={{
+        style: { color: 'white',borderColor:'white' }, // Sets input text color to white
+    }}
+    InputLabelProps={{
+        style: { color: 'white',borderColor:'white' }, // Sets label text color to white
+    }}
+/>
+                            
                             <select
                                 name="type"
                                 value={formData.type}
                                 onChange={handleChange}
-                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-lg"
+                                style={{ width: '25%', borderRadius: '4px', marginTop:'10px' }}
                             >
                                 <option value="income">Income</option>
                                 <option value="expense">Expense</option>
                             </select>
+
                             <div className="date-picker relative">
-                                <label htmlFor="date" className="block text-sm font-semibold mb-1">Date: </label>
-                                <p></p>
-                                <DatePicker
-                                    selected={selectedDate}
-                                    onChange={(date) => setSelectedDate(date)}
-                                    dateFormat="yyyy-MM-dd"
-                                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-md hover:shadow-lg"
-                                    calendarClassName="custom-datepicker"
-                                    wrapperClassName="datepicker-wrapper"
-                                />
-                            </div>
-                            <input
-                                type="text"
-                                name="comments"
-                                placeholder="Comments"
-                                value={formData.comments}
-                                onChange={handleChange}
-                                className="w-full p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            <label htmlFor="date" className="block text-lg font-medium mb-2"></label>
+                            <DatePicker
+                                selected={selectedDate}
+                                onChange={(date) => setSelectedDate(date)}
+                                dateFormat="yyyy-MM-dd"
+                                className="w-1/4 p-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out shadow-lg hover:shadow-xl"
+                                calendarClassName="custom-datepicker"
+                                wrapperClassName="datepicker-wrapper"
                             />
+                        </div>
+
+<TextField
+    id="outlined-comments"
+    label="Add Comments"
+    value={formData.comments}
+    onChange={(e) => setFormData({ ...formData, comments: e.target.value })}
+    variant="outlined"
+    fullWidth
+    InputProps={{
+        style: { color: 'white' }, // Makes input text white
+    }}
+    InputLabelProps={{
+        style: { color: 'white' }, // Makes label text white
+    }}
+/>
                             <div className="recurring-costs">
                                 <Select
                                     isMulti
@@ -362,7 +379,9 @@ const HomePage = () => {
                                             ...provided,
                                             backgroundColor: 'white',
                                             borderColor: '#2a2a2a',
+                                            borderRadius:'4px',
                                             boxShadow: 'none',
+                                            marginTop:'10px',
                                             '&:hover': {
                                                 borderColor: '#007BFF',
                                             },
@@ -408,9 +427,9 @@ const HomePage = () => {
                             />
                         </div>
                     </div>
-                    <div className="chart-container">                    
-                        <div className="calendar-container">
-                            <h3>Financial Entries By Date</h3>
+                    <div className="chart-container"> 
+                    <h3>Financial Entries By Date</h3>                   
+                        <div className="calendar-container" style={{ borderRadius: '7rem', overflow: 'hidden', marginTop:'35px' }}>
                             <Calendar
                                 onChange={handleDateClick}
                                 value={date}
@@ -436,8 +455,6 @@ const HomePage = () => {
                     </div>
                 </div>
 
-                <div className="extra-containers">
-                </div>
 
                 {showModal && (
                     <div className="modal-overlay">

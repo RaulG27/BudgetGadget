@@ -19,6 +19,10 @@ const newUserSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    favorite_stocks: {
+        type: [String], // Array of stock symbols
+        default: [],
+    },
 }, { collection: 'users' }); // Explicitly specify the collection name
 
 // Create and export the User model
