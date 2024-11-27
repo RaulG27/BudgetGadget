@@ -42,11 +42,17 @@ router.post('/entries', async (req, res) => {
     }
 });
 
-// Route to fetch all financial entries
+// Route to fetch financial entries for a specific user
 router.get('/entries', async (req, res) => {
+    const { userid } = req.query;
+
+    if (!userid) {
+        return res.status(400).json({ message: 'User ID is required' });
+    }
+
     try {
-        // Fetch all financial entries from the database
-        const entries = await FinancialEntry.find().sort({ date: -1 }); // Sort entries by date, newest first
+        // Fetch financial entries for the specific user
+        const entries = await FinancialEntry.find({ userid }).sort({ date: -1 }); // Filter by userid and sort by date
         
         // Send the fetched entries as a response
         res.status(200).json(entries);
