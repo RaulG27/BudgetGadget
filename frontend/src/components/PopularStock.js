@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import stockData from '../data/stockData'; // Adjust the path as necessary
 import './styles/global.css'; // Import the CSS for styling
+import { Sparklines, SparklinesLine } from 'react-sparklines'; // Import Sparklines for charting
 
 const FavoriteStock = ({ userId }) => {
     const [favorites, setFavorites] = useState([]);
@@ -13,7 +14,7 @@ const FavoriteStock = ({ userId }) => {
             if (!userId) return; // Exit if userId is not available
 
             try {
-                const response = await fetch(`http://localhost:8081/user/${userId}`);
+                const response = await fetch(`http://localhost:8081/user/getUserById`);
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Fetched user data:', data); // Log the response
@@ -104,6 +105,36 @@ const FavoriteStock = ({ userId }) => {
         }
     };
 
+    const generateChartData = (symbol) => {
+        // Function to generate chart data for the given stock symbol
+        // Replace this with actual data fetching logic
+        return [1, 2, 3, 4, 5]; // Sample data for demonstration
+    };
+
+    const getStockPrice = (symbol) => {
+        // Function to get the stock price for the given symbol
+        // Replace this with actual data fetching logic
+        return 100; // Sample price for demonstration
+    };
+
+    const getChangeColor = (symbol) => {
+        // Function to get the change color for the given symbol
+        // Replace this with actual data fetching logic
+        return 'green'; // Sample color for demonstration
+    };
+
+    const get24hChange = (symbol) => {
+        // Function to get the 24h change for the given symbol
+        // Replace this with actual data fetching logic
+        return 1; // Sample 24h change for demonstration
+    };
+
+    const getArrowDirection = (symbol) => {
+        // Function to get the arrow direction for the given symbol
+        // Replace this with actual data fetching logic
+        return '↑'; // Sample arrow direction for demonstration
+    };
+
     return (
         <div className="sidebar2">
             <div className="stock-list">
@@ -126,17 +157,35 @@ const FavoriteStock = ({ userId }) => {
                     ))}
                 </ul>
                 <h4>Your Favorites</h4>
-                <ul>
-                    {favorites.map((symbol, index) => (
-                        <li 
-                            key={`${symbol}-${index}`}
-                            onClick={() => removeFavorite(symbol)}
-                            style={{ cursor: 'pointer', color: 'gold', marginBottom: '5px' }}
-                        >
-                            {symbol}
-                        </li>
-                    ))}
-                </ul>
+                {favorites.length > 0 ? (
+                    <ul>
+                        {favorites.map((symbol, index) => (
+                            <li 
+                                key={`${symbol}-${index}`}
+                                style={{ display: 'flex', alignItems: 'center' }}
+                            >
+                                <div style={{ flex: '1', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '5px' }}>
+                                    <span onClick={() => removeFavorite(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
+                                        X
+                                    </span>
+                                    {symbol}: {getStockPrice(symbol)} USD
+                                    <br />
+                                    24h Change: 
+                                    <span style={{ color: getChangeColor(symbol), marginTop: '25px',marginRight: '25px' }}>
+                                        {get24hChange(symbol).toFixed(2)}% {getArrowDirection(symbol)}
+                                    </span>
+                                    <div style={{ width: '80px', height: '80px', marginLeft: '5px', marginTop: '50px' }}>
+                                        <Sparklines data={generateChartData(symbol)}>
+                                            <SparklinesLine color={getChangeColor(symbol)} />
+                                        </Sparklines>
+                                    </div>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No favorites added.</p>
+                )}
             </div>
         </div>
     );

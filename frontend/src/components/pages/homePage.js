@@ -111,12 +111,16 @@ const HomePage = () => {
     };
 
     const calculateTodayExpenses = (entries) => {
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
+    
         const expensesToday = entries
-            .filter(entry => entry.type === 'expense' && new Date(entry.date).toISOString().split('T')[0] === today)
+            .filter(entry => {
+                const entryDate = new Date(entry.date).toISOString().split('T')[0];
+                return entry.type === 'expense' && entryDate === today;
+            })
             .reduce((total, entry) => total + entry.amount, 0);
-        
-        setTodayExpenses(expensesToday);
+    
+        setTodayExpenses(expensesToday); // Update the state with today's total expenses
     };
 
     const updateDailyBudget = async (newAmount) => {
@@ -130,7 +134,6 @@ const HomePage = () => {
             const data = await response.json();
             if (response.ok) {
                 setDailyBudget(data.amount);
-                setMessage('Daily budget updated successfully!');
             } else {
                 setMessage(`Error: ${data.message}`);
                 console.error('Error response:', data);
@@ -142,7 +145,9 @@ const HomePage = () => {
     };
 
     const handleBudgetChange = (e) => {
-        setDailyBudget(e.target.value);
+        const newAmount = Number(e.target.value);
+        setDailyBudget(newAmount); // Update the daily budget state directly
+        updateDailyBudget(newAmount); // Call the update function with the new budget
     };
 
     const handleBudgetSubmit = (e) => {
@@ -161,6 +166,9 @@ const HomePage = () => {
             recurring_cost: selectedOptions ? selectedOptions.map(option => option.value) : [],
         }));
     };
+
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -195,6 +203,7 @@ const HomePage = () => {
                 setMessage('Entry added successfully!');
                 setFormData({ amount: '', type: 'income', comments: '', recurring_cost: [] });
                 fetchEntries(user.id);
+                calculateTodayExpenses(entries); // Recalculate today's expenses to update the chart
             } else {
                 setMessage(`Error: ${data.message}`);
                 console.error('Error response:', data);
@@ -204,6 +213,7 @@ const HomePage = () => {
             console.error('Submission error:', error);
         }
     };
+
 
     const toggleModal = () => {
         setShowModal(!showModal);
@@ -232,9 +242,9 @@ const HomePage = () => {
         labels: ['Daily Budget', 'Spent Today'],
         datasets: [
             {
-                data: [dailyBudget, todayExpenses],
-                backgroundColor: ['#A8D5BA', '#FFE08A'],       // Washed-Out Green and Washed-Out Yellow
-hoverBackgroundColor: ['#8BBF9E', '#E0C572'],  // Slightly Darker Green and Yellow for Hover
+                data: [dailyBudget - todayExpenses, todayExpenses], // Remaining budget and expenses
+                backgroundColor: ['#A8D5BA', '#FFE08A'],
+                hoverBackgroundColor: ['#8BBF9E', '#E0C572'],
             },
         ],
     };
@@ -279,16 +289,15 @@ hoverBackgroundColor: ['#8BBF9E', '#E0C572'],  // Slightly Darker Green and Yell
         <div className="background-container">
             <div className="container">
                 <div className="header">
-                    <h2>Daily Budget: ${dailyBudget}</h2>
-                    <form onSubmit={handleBudgetSubmit}>
-                        <input
-                            type="number"
-                            value={dailyBudget}
-                            onChange={handleBudgetChange}
-                            required
-                        />
-                        <button type="submit" className="button">Update</button>
-                    </form>
+                    <h2>Daily Budget: $<input
+                        type="number"
+                        value={dailyBudget === 0 ? '' : dailyBudget}
+                        onChange={handleBudgetChange}
+                        required
+                        placeholder='...'
+                        style={{ border: 'none', padding: '0', margin: '0', width: '100px', height: 'auto', fontSize: 'inherit', fontFamily: 'inherit', color: 'inherit', backgroundColor: 'inherit', textAlign: 'center' }}
+                    /></h2>
+                    {message && <p>{message}</p>}
                 </div>
                 <div className="content">
                     <div className="chart-container">
@@ -429,7 +438,7 @@ hoverBackgroundColor: ['#8BBF9E', '#E0C572'],  // Slightly Darker Green and Yell
                     </div>
                     <div className="chart-container"> 
                     <h3>Financial Entries By Date</h3>                   
-                        <div className="calendar-container" style={{ borderRadius: '7rem', overflow: 'hidden', marginTop:'35px' }}>
+                        <div className="calendar-container" style={{ overflow: 'hidden', marginTop:'35px' }}>
                             <Calendar
                                 onChange={handleDateClick}
                                 value={date}

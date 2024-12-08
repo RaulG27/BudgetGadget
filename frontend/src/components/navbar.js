@@ -62,6 +62,8 @@ const Navbar = () => {
           z-index: 1001;
           cursor: pointer;
           display: none; /* Hidden by default */
+          background-color: black;
+          color: black;
         }
 
         .navbar {
