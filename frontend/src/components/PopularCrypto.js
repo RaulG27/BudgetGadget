@@ -140,7 +140,7 @@ const FavoriteCrypto = ({ userId }) => {
                                 style={{ display: 'flex', alignItems: 'center' }}
                             >
                                 <div style={{ flex: '1', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '5px' }}>
-                                    <span onClick={() => removeFavorite(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
+                                    <span onClick={() => removeFavorite(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'red' }}>
                                         X
                                     </span>
                                     {symbol}: {getCryptoPrice(symbol)} USD

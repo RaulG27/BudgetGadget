@@ -313,48 +313,49 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    <div className="financial-entry bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+                    <div className="financial-entry bg-gray-900 p-10 rounded-xl shadow-xl text-white">
                         <h3 className="text-2xl font-bold mb-6">Add Financial Entry</h3>
                         <form onSubmit={handleSubmit} className="space-y-6">
 
                         <TextField
-    required
-    id="outlined-required"
-    label="Enter Amount"
-    value={formData.amount}
-    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-    variant="outlined"
-    fullWidth
-    InputProps={{
-        style: { color: 'white',borderColor:'white' }, // Sets input text color to white
-    }}
-    InputLabelProps={{
-        style: { color: 'white',borderColor:'white' }, // Sets label text color to white
-    }}
-/>
-                            
-                            <select
-                                name="type"
-                                value={formData.type}
-                                onChange={handleChange}
-                                className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 rounded-lg"
-                                style={{ width: '25%', borderRadius: '4px', marginTop:'10px' }}
-                            >
-                                <option value="income">Income</option>
-                                <option value="expense">Expense</option>
-                            </select>
-
-                            <div className="date-picker relative">
-                            <label htmlFor="date" className="block text-lg font-medium mb-2"></label>
-                            <DatePicker
-                                selected={selectedDate}
-                                onChange={(date) => setSelectedDate(date)}
-                                dateFormat="yyyy-MM-dd"
-                                className="w-1/4 p-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 transition duration-150 ease-in-out shadow-lg hover:shadow-xl"
-                                calendarClassName="custom-datepicker"
-                                wrapperClassName="datepicker-wrapper"
+                                required
+                                id="outlined-required"
+                                label="Enter Amount"
+                                value={formData.amount}
+                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                variant="outlined"
+                                fullWidth
+                                InputProps={{
+                                    style: { color: 'white',borderColor:'white' }, // Sets input text color to white
+                                }}
+                                InputLabelProps={{
+                                    style: { color: 'white',borderColor:'white' }, // Sets label text color to white
+                                }}
                             />
-                        </div>
+                            <div className="flex items-center">
+                                <select
+                                    name="type"
+                                    value={formData.type}
+                                    onChange={handleChange}
+                                    className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                    style={{ width: '40%', borderRadius: '4px', marginTop: '10px' }}
+                                >
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+
+                               
+                                    <label htmlFor="date" className="block text-lg font-medium mb-2 rounded-md"></label>
+                                    <DatePicker
+                                        selected={selectedDate}
+                                        onChange={(date) => setSelectedDate(date)}
+                                        dateFormat="yyyy-MM-dd"
+                                        
+                                        className="w-10 p-2 mr-4 h-2 transition duration-150 ease-in-out"
+                                        wrapperClassName="datepicker-wrapper"
+                                    />
+                                
+                            </div>
 
 <TextField
     id="outlined-comments"
@@ -377,6 +378,7 @@ const HomePage = () => {
                                     options={recurringOptions}
                                     className="basic-multi-select"
                                     classNamePrefix="select"
+                                    placeholder="Select Category"
                                     value={formData.recurring_cost.map(cost => ({ value: cost, label: cost }))}
                                     onChange={handleRecurringCostChange}
                                     styles={{
@@ -436,6 +438,8 @@ const HomePage = () => {
                             />
                         </div>
                     </div>
+
+
                     <div className="chart-container"> 
                     <h3>Financial Entries By Date</h3>                   
                         <div className="calendar-container" style={{ overflow: 'hidden', marginTop:'35px' }}>
@@ -446,6 +450,8 @@ const HomePage = () => {
                             />
                         </div>
                     </div>
+
+
                     <div className="chart-container">
                         <h3>Upcoming Expenses</h3>
                         <ul>

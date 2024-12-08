@@ -1,6 +1,5 @@
-import React from "react";
-// We use Route in order to define the different routes of our application
-import { Route, Routes } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 // We import all the components we need in our app
 import Navbar from "./components/navbar";
@@ -9,16 +8,18 @@ import HomePage from "./components/pages/homePage";
 import Login from "./components/pages/loginPage";
 import Signup from "./components/pages/registerPage";
 import PrivateUserProfile from "./components/pages/privateUserProfilePage";
-import { createContext, useState, useEffect } from "react";
+import { createContext } from "react";
 import getUserInfo from "./utilities/decodeJwt";
 
 export const UserContext = createContext();
 
 const App = () => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
+  // Check user authentication status on app load
   useEffect(() => {
-    setUser(getUserInfo());
+    const userInfo = getUserInfo();
+    setUser(userInfo);
   }, []);
 
   return (
@@ -26,10 +27,19 @@ const App = () => {
       <Navbar />
       <UserContext.Provider value={user}>
         <Routes>
-          <Route exact path="/" element={<LandingPage />} />
-          <Route exact path="/home" element={<HomePage />} />
-          <Route exact path="/login" element={<Login />} />
-          <Route exact path="/signup" element={<Signup />} />
+          {/* Landing page logic: If logged in, redirect to /home */}
+          <Route
+            path="/"
+            element={user ? <Navigate to="/home" /> : <LandingPage />}
+          />
+          {/* Home page: Only accessible if logged in */}
+          <Route
+            path="/home"
+            element={user ? <HomePage /> : <Navigate to="/" />}
+          />
+          {/* Static routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/privateUserProfile" element={<PrivateUserProfile />} />
         </Routes>
       </UserContext.Provider>
@@ -37,6 +47,4 @@ const App = () => {
   );
 };
 
-
-
-export default App
+export default App;

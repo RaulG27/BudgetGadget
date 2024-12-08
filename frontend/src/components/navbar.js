@@ -6,7 +6,7 @@ import { CiLogin } from "react-icons/ci";
 
 const Navbar = () => {
   const [user, setUser] = useState({});
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
@@ -14,8 +14,8 @@ const Navbar = () => {
   }, []);
 
   const iconStyles = {
-    fontSize: '30px', // Adjust icon size
-    color: 'white',
+    fontSize: '35px', // Adjust icon size
+    color: 'rgb(255, 136, 0)',
   };
 
   const activeIconStyles = {
@@ -62,15 +62,16 @@ const Navbar = () => {
           z-index: 1001;
           cursor: pointer;
           display: none; /* Hidden by default */
-          background-color: black;
-          color: black;
+           background-color: rgb(87, 49, 150);
+           border-radius: 3px;
+          
         }
 
         .navbar {
           position: fixed;
           display: flex;
           flex-direction: row;
-          background-color: #333333;
+          background-color: rgb(87, 49, 150);
           padding: 10px;
           box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.5);
           z-index: 1000;
