@@ -23,6 +23,10 @@ const newUserSchema = new mongoose.Schema({
         type: [String], // Array of stock symbols
         default: [],
     },
+    favorite_cryptos: { // New field for favorite cryptocurrencies
+        type: [String], // Array of cryptocurrency symbols
+        default: [],
+    },
 }, { collection: 'users' }); // Explicitly specify the collection name
 
 // Create and export the User model

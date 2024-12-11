@@ -6,7 +6,7 @@
 }
 
 .background-container {
-    background-color: rgb(170, 170, 166); /* Set background color */
+    background-color: rgb(228, 208, 143); /* Set background color */
     color: white; /* Set text color for contrast */
     min-height: 100vh; /* Ensure it covers the full viewport height */
 }
@@ -30,7 +30,7 @@
     color: white;
     margin-top: 35px;
     width: 30%; /* Set width to 30% for desktop */
-    margin: 35px auto; /* Centered the header horizontally */
+    margin-bottom:5px;
     flex-wrap: wrap; /* Added to make the header responsive */
 }
 
@@ -51,7 +51,7 @@
 
 /* Content styling */
 .content {
-    background-color: rgb(170, 170, 166);
+    background-color: rgb(228, 208, 143);
     display: flex;
     flex-direction: row;
     gap: 20px;
@@ -131,12 +131,13 @@
 
 .react-datepicker__day--selected {
    background: rgb(255, 136, 0);
+   border-radius: 80px;
   }
 
   .datepicker-wrapper {
-    transform: translateX(88px);
-    border-radius: 120px;
-  }
+    border-radius: 8px;
+    width: 100px; /* Set the exact width */
+}
 /* Extra containers styling */
 .extra-containers {
     display: grid;

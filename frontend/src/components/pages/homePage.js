@@ -21,7 +21,7 @@ const HomePage = () => {
     const [user, setUser] = useState({});
     const [formData, setFormData] = useState({
         amount: '',
-        type: 'income',
+        type: 'expense',
         comments: '',
         recurring_cost: [],
     });
@@ -286,19 +286,49 @@ const HomePage = () => {
     };
 
     return (
+        
         <div className="background-container">
             <div className="container">
-                <div className="header">
-                    <h2>Daily Budget: $<input
-                        type="number"
-                        value={dailyBudget === 0 ? '' : dailyBudget}
-                        onChange={handleBudgetChange}
-                        required
-                        placeholder='...'
-                        style={{ border: 'none', padding: '0', margin: '0', width: '100px', height: 'auto', fontSize: 'inherit', fontFamily: 'inherit', color: 'inherit', backgroundColor: 'inherit', textAlign: 'center' }}
-                    /></h2>
-                    {message && <p>{message}</p>}
-                </div>
+            <div className="header" style={{ textAlign: 'center', padding: '10px' }}>
+  <h2 style={{ marginBottom: '5px', fontSize: '2rem' }}>Daily Budget</h2>
+  
+  <div
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: '5px',
+    }}
+  >
+    <span style={{ fontSize: '1.5rem', paddingLeft:'30px' }}>$</span>
+    <input
+      type="number"
+      value={dailyBudget === 0 ? '' : dailyBudget}
+      onChange={handleBudgetChange}
+      placeholder="..."
+      style={{
+        border: '1px solid #666',
+        borderRadius: '4px',
+        padding: '10px',
+        fontSize: '1em',
+        width: '80px',
+        textAlign: 'center',
+        marginLeft: '15px',
+      }}
+    />
+  </div>
+  {message && (
+    <p
+      style={{
+        fontSize: '0.9rem',
+        color: 'red',
+        marginTop: '10px',
+      }}
+    >
+      {message}
+    </p>
+  )}
+</div>
                 <div className="content">
                     <div className="chart-container">
                         <h3>Total Amount Spent Today:</h3>
@@ -332,34 +362,11 @@ const HomePage = () => {
                                     style: { color: 'white',borderColor:'white' }, // Sets label text color to white
                                 }}
                             />
-                            <div className="flex items-center">
-                                <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                    className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                    style={{ width: '40%', borderRadius: '4px', marginTop: '10px' }}
-                                >
-                                    <option value="income">Income</option>
-                                    <option value="expense">Expense</option>
-                                </select>
-
-                               
-                                    <label htmlFor="date" className="block text-lg font-medium mb-2 rounded-md"></label>
-                                    <DatePicker
-                                        selected={selectedDate}
-                                        onChange={(date) => setSelectedDate(date)}
-                                        dateFormat="yyyy-MM-dd"
-                                        
-                                        className="w-10 p-2 mr-4 h-2 transition duration-150 ease-in-out"
-                                        wrapperClassName="datepicker-wrapper"
-                                    />
-                                
-                            </div>
+                                                        
 
 <TextField
     id="outlined-comments"
-    label="Add Comments"
+    label="Add Comments (Optional)"
     value={formData.comments}
     onChange={(e) => setFormData({ ...formData, comments: e.target.value })}
     variant="outlined"
@@ -371,6 +378,29 @@ const HomePage = () => {
         style: { color: 'white' }, // Makes label text white
     }}
 />
+
+<select
+                                    name="type"
+                                    value={formData.type}
+                                    onChange={handleChange}
+                                    className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                                    style={{ width: '44.5%', borderRadius: '4px', marginTop: '10px' }}
+                                >
+                                    <option value="income">Income</option>
+                                    <option value="expense">Expense</option>
+                                </select>
+
+                               
+                                    <label htmlFor="date" className="block text-lg font-medium mb-4 rounded-sm"></label>
+                                    <DatePicker
+                                        selected={selectedDate}
+                                        onChange={(date) => setSelectedDate(date)}
+                                        dateFormat="yyyy-MM-dd"
+                                        
+                                        className="p-2 transition duration-150 ease-in-out"   
+                                        wrapperClassName="datepicker-wrapper"
+                                    />
+
                             <div className="recurring-costs">
                                 <Select
                                     isMulti
@@ -416,6 +446,9 @@ const HomePage = () => {
                                     }}
                                 />
                             </div>
+
+
+                            
                             <button type="submit" className="button">Add Entry</button>
                         </form>
                         {message && <p className="mt-2 text-green-400">{message}</p>}

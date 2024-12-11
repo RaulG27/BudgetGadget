@@ -1,4 +1,4 @@
-// userFavoriteStocks.js
+// userFavoriteCryptos.js
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
@@ -9,8 +9,8 @@ router.get('/favorites/test', (req, res) => {
     res.json({ message: 'Favorites route is connected' });
 });
 
-// Route to add a favorite stock
-router.post('/stocks/favorites', async (req, res) => {
+// Route to add a favorite crypto
+router.post('/cryptos/favorites', async (req, res) => {
     const { userId, symbol } = req.body;
     console.log('Received request with userId:', userId, 'and symbol:', symbol);
 
@@ -24,18 +24,18 @@ router.post('/stocks/favorites', async (req, res) => {
             });
         }
 
-        if (!user.favorite_stocks.includes(symbol)) {
-            user.favorite_stocks.push(symbol);
+        if (!user.favorite_cryptos.includes(symbol)) {
+            user.favorite_cryptos.push(symbol);
             await user.save();
             return res.status(200).json({
-                message: 'Stock added successfully',
-                favorites: user.favorite_stocks,
+                message: 'Crypto added successfully',
+                favorites: user.favorite_cryptos,
             });
         }
 
         return res.status(200).json({
-            message: 'Stock already in favorites',
-            favorites: user.favorite_stocks,
+            message: 'Crypto already in favorites',
+            favorites: user.favorite_cryptos,
         });
 
     } catch (error) {
@@ -47,8 +47,8 @@ router.post('/stocks/favorites', async (req, res) => {
     }
 });
 
-// Route to delete a favorite stock
-router.delete('/stocks/favorites', async (req, res) => {
+// Route to delete a favorite crypto
+router.delete('/cryptos/favorites', async (req, res) => {
     const { userId, symbol } = req.body;
     console.log('Received request to delete favorite with userId:', userId, 'and symbol:', symbol);
 
@@ -60,12 +60,12 @@ router.delete('/stocks/favorites', async (req, res) => {
         }
 
         // Remove the symbol from the user's favorites
-        user.favorite_stocks = user.favorite_stocks.filter(fav => fav !== symbol);
+        user.favorite_cryptos = user.favorite_cryptos.filter(fav => fav !== symbol);
         await user.save();
 
         return res.status(200).json({
-            message: 'Stock removed successfully',
-            favorites: user.favorite_stocks,
+            message: 'Crypto removed successfully',
+            favorites: user.favorite_cryptos,
         });
 
     } catch (error) {
@@ -77,8 +77,8 @@ router.delete('/stocks/favorites', async (req, res) => {
     }
 });
 
-// Route to get user's favorite stocks by userId
-router.get('/stocks/favorites/:userId', async (req, res) => {
+// Route to get user's favorite cryptos by userId
+router.get('/cryptos/favorites/:userId', async (req, res) => {
     const userId = req.params.userId;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -93,7 +93,7 @@ router.get('/stocks/favorites/:userId', async (req, res) => {
         }
 
         return res.json({
-            favorites: user.favorite_stocks,
+            favorites: user.favorite_cryptos,
         });
     } catch (error) {
         console.error('Server error:', error);
@@ -104,7 +104,7 @@ router.get('/stocks/favorites/:userId', async (req, res) => {
     }
 });
 
-// Route to get user by ID for stocks (including favorites)
+// Route to get user by ID for cryptos (including favorites)
 router.get('/user/:id', async (req, res) => {
     const userId = req.params.id;
 
@@ -120,7 +120,7 @@ router.get('/user/:id', async (req, res) => {
 
         res.json({
             username: user.username,
-            favorite_stocks: user.favorite_stocks,
+            favorite_cryptos: user.favorite_cryptos,
         });
     } catch (error) {
         console.error('Server error:', error);

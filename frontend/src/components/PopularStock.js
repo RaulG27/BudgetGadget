@@ -3,35 +3,35 @@ import stockData from '../data/stockData'; // Adjust the path as necessary
 import './styles/global.css'; // Import the CSS for styling
 import { Sparklines, SparklinesLine } from 'react-sparklines'; // Import Sparklines for charting
 
-const FavoriteStock = ({ userId }) => {
-    const [favorites, setFavorites] = useState([]);
+const PopularStock = ({ userId }) => {
+    const [stocks, setStocks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStocks, setFilteredStocks] = useState([]);
 
     // Fetch user's favorite stocks when userId changes
     useEffect(() => {
-        const fetchFavorites = async (userId) => {
+        const fetchStocks = async (userId) => {
             if (!userId) return; // Exit if userId is not available
-
+    
             try {
-                const response = await fetch(`http://localhost:8081/user/getUserById`);
+                const response = await fetch(`http://localhost:8081/user/stocks/favorites/${userId}`);
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Fetched user data:', data); // Log the response
-                    if (data.favorite_stocks) {
-                        setFavorites(data.favorite_stocks); // Set favorites from the user data
+                    if (data.favorites) { // Look for 'favorites' in the response
+                        setStocks(data.favorites); // Set stocks from the 'favorites' key
                     } else {
-                        console.error('favorite_stocks not found in response:', data);
+                        console.error('favorites not found in response:', data);
                     }
                 } else {
-                    console.error('Error fetching favorites:', await response.text());
+                    console.error('Error fetching stocks:', await response.text());
                 }
             } catch (error) {
-                console.error('Error fetching favorites:', error);
+                console.error('Error fetching stocks:', error);
             }
         };
-
-        fetchFavorites(userId);
+    
+        fetchStocks(userId);
     }, [userId]);
 
     // Update filtered stocks based on search term
@@ -43,14 +43,14 @@ const FavoriteStock = ({ userId }) => {
         setFilteredStocks(results);
     }, [searchTerm]);
 
-    const addFavorite = async (symbol) => {
+    const addStock = async (symbol) => {
         if (!userId) {
             console.error('No userId available');
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:8081/user/favorites', {
+            const response = await fetch('http://localhost:8081/user/stocks/favorites', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json'
@@ -62,27 +62,28 @@ const FavoriteStock = ({ userId }) => {
             });
 
             if (response.ok) {
-                setFavorites(prev => [...prev, symbol]); // Update favorites state
-                setSearchTerm('');
+                const data = await response.json();
+                setStocks(data.favorite_stocks); // Update stocks state with the updated list
+                setSearchTerm(''); // Clear search after adding
             } else {
-                console.error('Error adding favorite:', await response.json());
+                console.error('Error adding stock:', await response.json());
             }
         } catch (error) {
-            console.error('Error adding favorite:', error);
+            console.error('Error adding stock:', error);
         }
     };
 
-    const removeFavorite = async (symbol) => {
+    const removeStock = async (symbol) => {
         if (!userId) {
             console.error('No userId available');
             return;
         }
 
         // Optimistically update the UI
-        setFavorites(prev => prev.filter(fav => fav !== symbol));
+        setStocks(prev => prev.filter(stock => stock !== symbol));
 
         try {
-            const response = await fetch('http://localhost:8081/user/favorites', {
+            const response = await fetch('http://localhost:8081/user/stocks/favorites', {
                 method: 'DELETE',
                 headers: { 
                     'Content-Type': 'application/json'
@@ -95,43 +96,38 @@ const FavoriteStock = ({ userId }) => {
 
             if (!response.ok) {
                 // If the response is not ok, revert the optimistic update
-                setFavorites(prev => [...prev, symbol]);
-                console.error('Error removing favorite:', await response.json());
+                setStocks(prev => [...prev, symbol]);
+                console.error('Error removing stock:', await response.json());
             }
         } catch (error) {
             // Revert the optimistic update on error
-            setFavorites(prev => [...prev, symbol]);
-            console.error('Error removing favorite:', error);
+            setStocks(prev => [...prev, symbol]);
+            console.error('Error removing stock:', error);
         }
     };
 
     const generateChartData = (symbol) => {
         // Function to generate chart data for the given stock symbol
-        // Replace this with actual data fetching logic
         return [1, 2, 3, 4, 5]; // Sample data for demonstration
     };
 
     const getStockPrice = (symbol) => {
-        // Function to get the stock price for the given symbol
-        // Replace this with actual data fetching logic
+        // Function to get the stock price for the given symbol (should be replaced with API logic)
         return 100; // Sample price for demonstration
     };
 
     const getChangeColor = (symbol) => {
-        // Function to get the change color for the given symbol
-        // Replace this with actual data fetching logic
+        // Function to get the change color for the given symbol (should be replaced with API logic)
         return 'green'; // Sample color for demonstration
     };
 
     const get24hChange = (symbol) => {
-        // Function to get the 24h change for the given symbol
-        // Replace this with actual data fetching logic
+        // Function to get the 24h change for the given symbol (should be replaced with API logic)
         return 1; // Sample 24h change for demonstration
     };
 
     const getArrowDirection = (symbol) => {
-        // Function to get the arrow direction for the given symbol
-        // Replace this with actual data fetching logic
+        // Function to get the arrow direction for the given symbol (should be replaced with API logic)
         return '↑'; // Sample arrow direction for demonstration
     };
 
@@ -149,29 +145,29 @@ const FavoriteStock = ({ userId }) => {
                     {searchTerm && filteredStocks.map((stock, index) => (
                         <li 
                             key={`${stock.symbol}-${index}`}
-                            onClick={() => addFavorite(stock.symbol)}
+                            onClick={() => addStock(stock.symbol)}
                             style={{ cursor: 'pointer', color: 'white', marginBottom: '5px' }}
                         >
                             {stock.symbol} - {stock.name}
                         </li>
                     ))}
                 </ul>
-                <h4>Your Favorites</h4>
-                {favorites.length > 0 ? (
+                <h4>Your Favorite Stocks</h4>
+                {stocks.length > 0 ? (
                     <ul>
-                        {favorites.map((symbol, index) => (
+                        {stocks.map((symbol, index) => (
                             <li 
                                 key={`${symbol}-${index}`}
                                 style={{ display: 'flex', alignItems: 'center' }}
                             >
                                 <div style={{ flex: '1', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '5px' }}>
-                                    <span onClick={() => removeFavorite(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
+                                    <span onClick={() => removeStock(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
                                         X
                                     </span>
                                     {symbol}: {getStockPrice(symbol)} USD
                                     <br />
                                     24h Change: 
-                                    <span style={{ color: getChangeColor(symbol), marginTop: '25px',marginRight: '25px' }}>
+                                    <span style={{ color: getChangeColor(symbol), marginTop: '25px', marginRight: '25px' }}>
                                         {get24hChange(symbol).toFixed(2)}% {getArrowDirection(symbol)}
                                     </span>
                                     <div style={{ width: '80px', height: '80px', marginLeft: '5px', marginTop: '50px' }}>
@@ -184,11 +180,11 @@ const FavoriteStock = ({ userId }) => {
                         ))}
                     </ul>
                 ) : (
-                    <p>No favorites added.</p>
+                    <p>No stocks added.</p>
                 )}
             </div>
         </div>
     );
 };
 
-export default FavoriteStock;
+export default PopularStock;

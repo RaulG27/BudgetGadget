@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const iconStyles = {
     fontSize: '35px', // Adjust icon size
-    color: 'rgb(255, 136, 0)',
+    color: 'white',
   };
 
   const activeIconStyles = {
