@@ -39,7 +39,6 @@ const cryptoData = {
         { symbol: "REN", name: "Ren" },
         { symbol: "1INCH", name: "1inch" },
         { symbol: "SUSHI", name: "SushiSwap" },
-        { symbol: "BTT", name: "BitTorrent" },
         { symbol: "STMX", name: "StormX" },
         { symbol: "CRO", name: "Crypto.com Coin" },
         { symbol: "LDO", name: "Lido DAO" },

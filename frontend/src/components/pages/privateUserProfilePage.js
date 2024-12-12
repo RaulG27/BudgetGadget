@@ -57,8 +57,8 @@ const handleLogout = () => {
     <div style={pageContainerStyles}>
       <div style={contentBoxStyles}>
         <h1>Welcome <span className='username'> {username}</span></h1>
-        <h3>Your registered email is: <span className='email'> {email}</span></h3>
-        <h3>Your UserID in MongoDB is: <span className='userId'> {id}</span></h3>
+        <h3>Registered email: <span className='email'> {email}</span></h3>
+        <h3>MongoDB UserID: <span className='userId'> {id}</span></h3>
         
         <Button 
   className="me-2" 

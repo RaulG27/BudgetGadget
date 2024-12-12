@@ -2,17 +2,39 @@ import React, { useState, useEffect } from 'react';
 import stockData from '../data/stockData'; // Adjust the path as necessary
 import './styles/global.css'; // Import the CSS for styling
 import { Sparklines, SparklinesLine } from 'react-sparklines'; // Import Sparklines for charting
+import axios from 'axios'; // Import axios for making HTTP requests
 
 const PopularStock = ({ userId }) => {
     const [stocks, setStocks] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredStocks, setFilteredStocks] = useState([]);
+    const [stockDetails, setStockDetails] = useState({});
 
-    // Fetch user's favorite stocks when userId changes
+    // Fetch stock details for all favorite stocks when component mounts or stocks list changes
     useEffect(() => {
-        const fetchStocks = async (userId) => {
+        const fetchAllStockDetails = async () => {
+            if (!stocks.length) return;
+            
+            try {
+                const symbols = stocks.join(',');
+                const response = await axios.get(
+                    `https://api.twelvedata.com/time_series?symbol=${symbols}&interval=1day&apikey=${process.env.REACT_APP_TWELVE_DATA_API_KEY}`
+                );
+                console.log('Fetched stock details:', response.data);
+                setStockDetails(response.data);
+            } catch (error) {
+                console.error('Error fetching stock details:', error);
+            }
+        };
+
+        fetchAllStockDetails();
+    }, [stocks]);
+
+    // Fetch user's favorite stocks when the component mounts or when userId changes
+    useEffect(() => {
+        const fetchStocks = async () => {
             if (!userId) return; // Exit if userId is not available
-    
+
             try {
                 const response = await fetch(`http://localhost:8081/user/stocks/favorites/${userId}`);
                 if (response.ok) {
@@ -28,9 +50,9 @@ const PopularStock = ({ userId }) => {
                 setStocks([]); // Reset to empty array on fetch failure
             }
         };
-    
-        fetchStocks(userId);
-    }, [userId]);
+
+        fetchStocks();
+    }, [userId]); // Added userId to the dependency array to prevent infinite requests
 
     // Update filtered stocks based on search term
     useEffect(() => {
@@ -116,23 +138,21 @@ const PopularStock = ({ userId }) => {
     };
 
     const getStockPrice = (symbol) => {
-        // Function to get the stock price for the given symbol (should be replaced with API logic)
-        return 100; // Sample price for demonstration
-    };
-
-    const getChangeColor = (symbol) => {
-        // Function to get the change color for the given symbol (should be replaced with API logic)
-        return 'green'; // Sample color for demonstration
+        return stockDetails[symbol]?.price || 'N/A';
     };
 
     const get24hChange = (symbol) => {
-        // Function to get the 24h change for the given symbol (should be replaced with API logic)
-        return 1; // Sample 24h change for demonstration
+        return stockDetails[symbol]?.changePercent || 0;
+    };
+
+    const getChangeColor = (symbol) => {
+        const change = get24hChange(symbol);
+        return change >= 0 ? 'green' : 'red'; // Determine color based on change
     };
 
     const getArrowDirection = (symbol) => {
-        // Function to get the arrow direction for the given symbol (should be replaced with API logic)
-        return '↑'; // Sample arrow direction for demonstration
+        const change = get24hChange(symbol);
+        return change >= 0 ? '↑' : '↓'; // Determine arrow direction based on change
     };
 
     return (

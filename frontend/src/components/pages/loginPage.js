@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import getUserInfo from "../../utilities/decodeJwt";
 
-const PRIMARY_COLOR = 'rgb(228, 208, 143)';
+const PRIMARY_COLOR = 'rgb(87, 49, 150)';
 const SECONDARY_COLOR = 'rgb(87, 49, 150)'
 const url = "http://localhost:8081/user/login";
 
@@ -14,7 +14,7 @@ const Login = () => {
   const [data, setData] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [light, setLight] = useState(false);
-  const [bgColor, setBgColor] = useState(SECONDARY_COLOR);
+  const [bgColor, setBgColor] = useState('rgb(228, 208, 143)');
   const [bgText, setBgText] = useState('Light Mode')
   const navigate = useNavigate();
 
@@ -39,13 +39,7 @@ const Login = () => {
     const obj = getUserInfo(user)
     setUser(obj)
 
-    if (light) {
-      setBgColor("white");
-      setBgText('Dark mode')
-    } else {
-      setBgColor(SECONDARY_COLOR);
-      setBgText('Light mode')
-    }
+
   }, [light]);
 
   const handleSubmit = async (e) => {
@@ -90,7 +84,7 @@ const Login = () => {
                     placeholder="Enter username"
                   />
                   <Form.Text className="text-muted">
-                    We just might sell your data
+                    We just MIGHT sell your data
                   </Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -103,24 +97,15 @@ const Login = () => {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                  <Form.Text className="text-muted pt-1">
+                  <Form.Text className="text-muted pt-1" style={{  color: 'black' }}>
                     Dont have an account?
                     <span>
-                      <Link to="/signup" style={labelStyling}> Sign up
+                      <Link to="/signup" style={{...labelStyling, color: 'rgb(87, 49, 150)'}}> Sign up
                       </Link>
                     </span>
                   </Form.Text>
                 </Form.Group>
                 <div class="form-check form-switch">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    id="flexSwitchCheckDefault"
-                    onChange={() => { setLight(!light) }}
-                  />
-                  <label class="form-check-label" for="flexSwitchCheckDefault" className='text-muted'>
-                    {bgText}
-                  </label>
                 </div>
                 {error && <div style={labelStyling} className='pt-3'>{error}</div>}
                 <Button

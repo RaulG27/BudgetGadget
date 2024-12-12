@@ -9,9 +9,9 @@ const editUser = require('./routes/userEditUser');
 const deleteUser = require('./routes/userDeleteAll');
 const userFinancialEntry = require('./routes/userFinancialEntry');
 const userFavoriteStocks = require('./routes/userFavoriteStocks');
-const userFavoriteCryptos = require('./routes/userFavoriteCryptos');
 const connectDB = require('./config/db.config'); // Ensure your DB config file is correct
 const userDailyBudget = require('./routes/userDailyBudget');
+const fetchApiRoute = require("./routes/fetchApi"); 
 require('dotenv').config();
 const SERVER_PORT = process.env.PORT || 8081;
 
@@ -29,8 +29,8 @@ app.use('/user', editUser);
 app.use('/user', deleteUser);
 app.use('/user', userFinancialEntry); // Financial entries route
 app.use('/user', userFavoriteStocks);
-app.use('/user', userFavoriteCryptos);
 app.use('/budget', userDailyBudget); // Daily budget route
+app.use("/", fetchApiRoute); // Integrating fetchApi.js
 
 // Start server after connecting to DB
 connectDB().then(() => {

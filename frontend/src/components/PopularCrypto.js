@@ -152,7 +152,7 @@ const PopularCrypto = ({ userId }) => {
                         </li>
                     ))}
                 </ul>
-                <h4>Your Favorites</h4>
+                <h4>Your Favorite Cryptos</h4>
                 {favorites.length > 0 ? (
                     <ul>
                         {favorites.map((symbol, index) => (

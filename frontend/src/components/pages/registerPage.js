@@ -7,8 +7,8 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-const PRIMARY_COLOR = 'white';
-const SECONDARY_COLOR = '#6BA57A';
+const PRIMARY_COLOR = 'rgb(87, 49, 150)';
+const SECONDARY_COLOR = 'rgb(228, 208, 143)';
 const url = "http://localhost:8081/user/signup";
 
 const Register = () => {
@@ -23,15 +23,7 @@ const Register = () => {
     setData({ ...data, [input.name]: input.value });
   };
 
-  useEffect(() => {
-    if (light) {
-      setBgColor("black");
-      setBgText("Dark Mode");
-    } else {
-      setBgColor(SECONDARY_COLOR);
-      setBgText("Light Mode");
-    }
-  }, [light]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,7 +47,7 @@ const Register = () => {
 
   
   const buttonStyling = {
-    background: '#273A3A',
+    background: 'rgb(87, 49, 150)',
     borderStyle: "none",
     color: 'white',
   };
@@ -93,13 +85,7 @@ const Register = () => {
                   placeholder="Enter password"
                 />
               </Form.Group>
-              <Form.Check 
-                type="switch" 
-                id="flexSwitchCheckDefault"
-                label={bgText}
-                onChange={() => setLight(!light)}
-                className="mb-3"
-              />
+    
               {error && (
                 <div style={labelStyling} className="pt-3">
                   {error}
