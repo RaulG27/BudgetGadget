@@ -18,16 +18,14 @@ const PopularStock = ({ userId }) => {
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Fetched user data:', data); // Log the response
-                    if (data.favorites) { // Look for 'favorites' in the response
-                        setStocks(data.favorites); // Set stocks from the 'favorites' key
-                    } else {
-                        console.error('favorites not found in response:', data);
-                    }
+                    setStocks(data.favorites || []); // Ensure stocks is always an array
                 } else {
                     console.error('Error fetching stocks:', await response.text());
+                    setStocks([]); // Reset to empty array on error
                 }
             } catch (error) {
                 console.error('Error fetching stocks:', error);
+                setStocks([]); // Reset to empty array on fetch failure
             }
         };
     
@@ -62,8 +60,14 @@ const PopularStock = ({ userId }) => {
             });
 
             if (response.ok) {
-                const data = await response.json();
-                setStocks(data.favorite_stocks); // Update stocks state with the updated list
+                // Immediately update the stocks state with the new symbol
+                setStocks(prevStocks => {
+                    // Check if the symbol is already in the list to avoid duplicates
+                    if (!prevStocks.includes(symbol)) {
+                        return [...prevStocks, symbol];
+                    }
+                    return prevStocks;
+                });
                 setSearchTerm(''); // Clear search after adding
             } else {
                 console.error('Error adding stock:', await response.json());
@@ -153,35 +157,35 @@ const PopularStock = ({ userId }) => {
                     ))}
                 </ul>
                 <h4>Your Favorite Stocks</h4>
-                {stocks.length > 0 ? (
-                    <ul>
-                        {stocks.map((symbol, index) => (
-                            <li 
-                                key={`${symbol}-${index}`}
-                                style={{ display: 'flex', alignItems: 'center' }}
-                            >
-                                <div style={{ flex: '1', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '5px' }}>
-                                    <span onClick={() => removeStock(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
-                                        X
-                                    </span>
-                                    {symbol}: {getStockPrice(symbol)} USD
-                                    <br />
-                                    24h Change: 
-                                    <span style={{ color: getChangeColor(symbol), marginTop: '25px', marginRight: '25px' }}>
-                                        {get24hChange(symbol).toFixed(2)}% {getArrowDirection(symbol)}
-                                    </span>
-                                    <div style={{ width: '80px', height: '80px', marginLeft: '5px', marginTop: '50px' }}>
-                                        <Sparklines data={generateChartData(symbol)}>
-                                            <SparklinesLine color={getChangeColor(symbol)} />
-                                        </Sparklines>
-                                    </div>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>No stocks added.</p>
-                )}
+{Array.isArray(stocks) && stocks.length > 0 ? (
+    <ul>
+        {stocks.map((symbol, index) => (
+            <li 
+                key={`${symbol}-${index}`}
+                style={{ display: 'flex', alignItems: 'center' }}
+            >
+                <div style={{ flex: '1', display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '5px' }}>
+                    <span onClick={() => removeStock(symbol)} style={{ marginRight: '20px', cursor: 'pointer', color: 'gray' }}>
+                        X
+                    </span>
+                    {symbol}: {getStockPrice(symbol)} USD
+                    <br />
+                    24h Change: 
+                    <span style={{ color: getChangeColor(symbol), marginTop: '25px', marginRight: '25px' }}>
+                        {get24hChange(symbol).toFixed(2)}% {getArrowDirection(symbol)}
+                    </span>
+                    <div style={{ width: '80px', height: '80px', marginLeft: '5px', marginTop: '50px' }}>
+                        <Sparklines data={generateChartData(symbol)}>
+                            <SparklinesLine color={getChangeColor(symbol)} />
+                        </Sparklines>
+                    </div>
+                </div>
+            </li>
+        ))}
+    </ul>
+) : (
+    <p>No stocks added.</p>
+)}
             </div>
         </div>
     );
