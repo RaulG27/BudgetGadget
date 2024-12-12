@@ -331,6 +331,44 @@ const HomePage = () => {
         return markedDates.includes(dateString) ? 'highlight' : null;
     };
 
+    const deleteEntry = async (entryId) => {
+        try {
+            const response = await fetch(`http://localhost:8081/user/entries/${entryId}`, {
+                method: 'DELETE',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // Include authorization header if you're using JWT
+                    // 'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+            });
+
+            if (response.ok) {
+                // Remove the entry from the local state
+                const updatedEntries = entries.filter(entry => entry._id !== entryId);
+                setEntries(updatedEntries);
+                
+                // Update filtered entries for the selected date
+                const updatedSelectedDateEntries = selectedDateEntries.filter(entry => entry._id !== entryId);
+                setSelectedDateEntries(updatedSelectedDateEntries);
+                
+                // Recalculate expenses and other relevant states
+                calculateTodayExpenses(updatedEntries);
+                filterUpcomingExpenses(updatedEntries);
+                
+                // Optional: Show success message
+                setMessage('Entry deleted successfully');
+            } else {
+                // Handle error response
+                const errorData = await response.json();
+                setMessage(`Error deleting entry: ${errorData.message}`);
+                console.error('Delete error:', errorData);
+            }
+        } catch (error) {
+            console.error('Error deleting entry:', error);
+            setMessage('Failed to delete entry');
+        }
+    };
+
     return (
         
         <div className="background-container">
@@ -584,14 +622,39 @@ const HomePage = () => {
                     <div className="modal-overlay">
                         <div className="modal-content">
                             <div className="modal-inner-content">
-                                <h3>Entries for {selectedDate.toDateString()}</h3>
+                                <div style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    alignItems: 'center',
+                                    marginBottom: '15px'
+                                }}>
+                                    <h3>Entries for {selectedDate.toDateString()}</h3>
+                                </div>
                                 <ul>
                                     {selectedDateEntries.length > 0 ? (
                                         selectedDateEntries.map(entry => (
-                                            <li key={entry._id} className="entry-item">
+                                            <li key={entry._id} className="entry-item" style={{ 
+                                                display: 'flex', 
+                                                justifyContent: 'space-between', 
+                                                alignItems: 'center',
+                                                marginBottom: '10px'
+                                            }}>
                                                 <span>
                                                     {entry.type}: ${entry.amount} - {entry.comments}
                                                 </span>
+                                                <button 
+                                                    onClick={() => deleteEntry(entry._id)}
+                                                    style={{
+                                                        background: 'rgb(255, 136, 0)',
+                                                        color: 'white',
+                                                        border: 'none',
+                                                        borderRadius: '4px',
+                                                        padding: '5px 10px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                >
+                                                    x
+                                                </button>
                                             </li>
                                         ))
                                     ) : (
@@ -604,7 +667,7 @@ const HomePage = () => {
                     </div>
                 )}
                 <PopularCrypto apiKey={apiKey} userId={user.id} />
-                <PopularStock userId={user.id} />
+                <PopularStock apiKey={apiKey} userId={user.id} />
             </div>
         </div>
     );

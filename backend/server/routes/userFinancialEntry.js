@@ -62,4 +62,31 @@ router.get('/entries', async (req, res) => {
     }
 });
 
+// Add this new route for deleting a financial entry
+router.delete('/entries/:entryId', async (req, res) => {
+    const { entryId } = req.params;
+
+    try {
+        // Find and delete the entry
+        const deletedEntry = await FinancialEntry.findByIdAndDelete(entryId);
+
+        // If no entry was found, return a 404 error
+        if (!deletedEntry) {
+            return res.status(404).json({ message: 'Entry not found' });
+        }
+
+        // Return a success response
+        res.status(200).json({ 
+            message: 'Entry deleted successfully', 
+            deletedEntry 
+        });
+    } catch (error) {
+        console.error('Error deleting financial entry:', error);
+        res.status(500).json({ 
+            message: 'Error deleting financial entry', 
+            error: error.message 
+        });
+    }
+});
+
 module.exports = router;
