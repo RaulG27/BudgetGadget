@@ -12,11 +12,11 @@ const PrivateUserProfile = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  // Handle logout button
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/");
-  };
+// Handle logout button
+const handleLogout = () => {
+  localStorage.clear();
+  navigate('/login'); // Use relative path to go to the login page
+};
 
   useEffect(() => {
     setUser(getUserInfo());
@@ -24,7 +24,7 @@ const PrivateUserProfile = () => {
 
   // Styles for the page container
   const pageContainerStyles = {
-    backgroundColor: '#6BA57A', // Page background color
+    backgroundColor: 'rgb(228, 208, 143)', // Page background color
     minHeight: '100vh', // Full viewport height
     padding: '20px', // Add some padding around the content
     display: 'flex',
@@ -34,7 +34,7 @@ const PrivateUserProfile = () => {
 
   // Styles for the content box
   const contentBoxStyles = {
-    backgroundColor: '#273A3A', // Box background color
+    backgroundColor: 'rgb(87, 49, 150)', // Box background color
     color: 'white', // Text color for contrast
     padding: '20px', // Add padding inside the box
     borderRadius: '10px', // Rounded corners
@@ -57,12 +57,16 @@ const PrivateUserProfile = () => {
     <div style={pageContainerStyles}>
       <div style={contentBoxStyles}>
         <h1>Welcome <span className='username'> {username}</span></h1>
-        <h3>Your UserID in MongoDB is: <span className='userId'> {id}</span></h3>
         <h3>Your registered email is: <span className='email'> {email}</span></h3>
+        <h3>Your UserID in MongoDB is: <span className='userId'> {id}</span></h3>
         
-        <Button className="me-2" onClick={handleShow}>
-          Log Out
-        </Button>
+        <Button 
+  className="me-2" 
+  onClick={handleShow} 
+  style={{ backgroundColor: 'rgb(255, 136, 0)', borderColor: 'rgb(255, 136, 0)' }}
+>
+  Log Out
+</Button>
         <Modal
           show={show}
           onHide={handleClose}

@@ -9,14 +9,14 @@ const Landingpage = () => {
         justifyContent: 'center', // Center horizontally
         alignItems: 'center', // Center vertically
         height: '100vh', // Full viewport height
-        backgroundColor: '#6BA57A', // Background color for the entire page
+        backgroundColor: 'rgb(228, 208, 143)', // Background color for the entire page
         margin: 0, // Remove default margin
         padding: 0, // Remove default padding
     };
 
     // Styles for the content box
     const contentBoxStyles = {
-        backgroundColor: '#273A3A', // Box background color
+        backgroundColor: 'rgb(87, 49, 150)', // Box background color
         padding: '20px', // Padding inside the box
         borderRadius: '10px', // Rounded corners for the box
         width: '100%', // Full width of the container
@@ -26,7 +26,7 @@ const Landingpage = () => {
 
     // Styles for the card
     const cardStyles = {
-        backgroundColor: '#273A3A', // Card background color
+        backgroundColor: 'rgb(87, 49, 150)', // Card background color
         color: 'white', // Text color to contrast with background
         borderRadius: '10px', // Rounded corners for the card
         border: 'none', // Remove default border

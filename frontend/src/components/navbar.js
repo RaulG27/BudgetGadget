@@ -33,10 +33,6 @@ const Navbar = () => {
   return (
     <>
       <div className="navbar">
-        <a href="/" style={getLinkStyle('/')} className="nav-link">
-          <CiLogin style={iconStyles} />
-          <span className="nav-text">Login/Sign-up</span>
-        </a>
         <a href="/home" style={getLinkStyle('/home')} className="nav-link">
           <FaHome style={iconStyles} />
           <span className="nav-text">Home</span>

@@ -37,6 +37,7 @@ const HomePage = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [upcomingExpenses, setUpcomingExpenses] = useState([]);
     const apiKey = process.env.REACT_APP_TWELVE_DATA_API_KEY;
+    const [timePeriod, setTimePeriod] = useState('monthly');
 
     const recurringOptions = [
         { value: 'Housing', label: 'Housing' },
@@ -46,6 +47,13 @@ const HomePage = () => {
         { value: 'Savings', label: 'Savings' },
         { value: 'Transportation', label: 'Transportation' },
         { value: 'Miscellaneous', label: 'Miscellaneous' },
+    ];
+
+    const timePeriodOptions = [
+        { value: 'daily', label: 'Daily' },
+        { value: 'weekly', label: 'Weekly' },
+        { value: 'monthly', label: 'Monthly' },
+        { value: 'yearly', label: 'Yearly' }
     ];
 
     useEffect(() => {
@@ -167,8 +175,9 @@ const HomePage = () => {
         }));
     };
 
-
-
+    const handleTimePeriodChange = (event) => {
+        setTimePeriod(event.target.value);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -214,7 +223,6 @@ const HomePage = () => {
         }
     };
 
-
     const toggleModal = () => {
         setShowModal(!showModal);
     };
@@ -238,17 +246,55 @@ const HomePage = () => {
 
     const sortedEntries = entries.sort((a, b) => new Date(b.date) - new Date(a.date));
     
+    const pieChartOptions = {
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: 'white',
+                    font: { weight: 'bold' },
+                },
+            },
+        },
+        cutout: 30, // Inner radius (in percentage of the chart radius)
+        radius: 100, // Outer radius (in percentage of the chart radius)
+    };
+    
     const pieChart1Data = {
-        labels: ['Daily Budget', 'Spent Today'],
+        labels: ['Daily Budget left', 'Spent Today'],
         datasets: [
             {
                 data: [dailyBudget - todayExpenses, todayExpenses], // Remaining budget and expenses
-                backgroundColor: ['#A8D5BA', '#FFE08A'],
-                hoverBackgroundColor: ['#8BBF9E', '#E0C572'],
+                backgroundColor: ['#A8D5BA', '#E94E77'],
+                hoverBackgroundColor: ['#8BBF9E', '#D53B68'],
+                borderColor: 'white', // Set border color to black
+                borderWidth: 1.4, // Set the width of the border
             },
         ],
     };
     
+    const filterEntriesByTimePeriod = (entries, period) => {
+        const now = new Date();
+        return entries.filter(entry => {
+            const entryDate = new Date(entry.date);
+            switch (period) {
+                case 'daily':
+                    return entryDate.toDateString() === now.toDateString();
+                case 'weekly':
+                    const oneWeekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+                    return entryDate >= oneWeekAgo && entryDate <= now;
+                case 'monthly':
+                    return entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
+                case 'yearly':
+                    return entryDate.getFullYear() === now.getFullYear();
+                default:
+                    return true;
+            }
+        });
+    };
+
+    const filteredEntries = filterEntriesByTimePeriod(entries, timePeriod);
+
     const categoryTotals = {
         Housing: 0,
         Utilities: 0,
@@ -259,7 +305,7 @@ const HomePage = () => {
         Miscellaneous: 0,
     };
 
-    entries.forEach(entry => {
+    filteredEntries.forEach(entry => {
         if (entry.type === 'expense') {
             entry.recurring_cost.forEach(cost => {
                 if (categoryTotals[cost] !== undefined) {
@@ -317,17 +363,7 @@ const HomePage = () => {
       }}
     />
   </div>
-  {message && (
-    <p
-      style={{
-        fontSize: '0.9rem',
-        color: 'red',
-        marginTop: '10px',
-      }}
-    >
-      {message}
-    </p>
-  )}
+
 </div>
                 <div className="content">
                     <div className="chart-container">
@@ -335,13 +371,12 @@ const HomePage = () => {
                         <h2>${todayExpenses}</h2>
                         <div className="currentDate">{currentDate}</div>
                         <div className="pie-chart">
-                            <Pie data={pieChart1Data} options={{ plugins: {
-                                            legend: {position: 'bottom', labels:{color:'white ',font: {weight: 'bold'}}},
-                                                    },
-                                                        }
-                                                            } />
+                        <Pie data={pieChart1Data} options={pieChartOptions} />
+
                         </div>
-                    </div>
+                        <button  onClick={handleTodayClick}  className="button" style={{left: '100px', marginBottom:"20px"}}>
+                            Today's Entries</button>
+                </div>
 
                     <div className="financial-entry bg-gray-900 p-10 rounded-xl shadow-xl text-white">
                         <h3 className="text-2xl font-bold mb-6">Add Financial Entry</h3>
@@ -356,7 +391,7 @@ const HomePage = () => {
                                 variant="outlined"
                                 fullWidth
                                 InputProps={{
-                                    style: { color: 'white',borderColor:'white' }, // Sets input text color to white
+                                    style: { color: 'white',borderColor:'white',marginBottom:'10px' }, // Sets input text color to white
                                 }}
                                 InputLabelProps={{
                                     style: { color: 'white',borderColor:'white' }, // Sets label text color to white
@@ -380,15 +415,22 @@ const HomePage = () => {
 />
 
 <select
-                                    name="type"
-                                    value={formData.type}
-                                    onChange={handleChange}
-                                    className="p-2 rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                                    style={{ width: '44.5%', borderRadius: '4px', marginTop: '10px' }}
-                                >
-                                    <option value="income">Income</option>
-                                    <option value="expense">Expense</option>
-                                </select>
+    name="type"
+    value={formData.type}
+    onChange={handleChange}
+    style={{ 
+        width: '44.5%', 
+        borderRadius: '8px', // Rounded corners
+        padding: '12px',
+        marginTop: '20px',
+        backgroundColor: 'rgb(255, 136, 0)', // Dark background
+        color: 'white', // White text
+        border: '1px solid #444', // Subtle border
+    }}
+>
+    <option value="income">Income</option>
+    <option value="expense">Expense</option>
+</select>
 
                                
                                     <label htmlFor="date" className="block text-lg font-medium mb-4 rounded-sm"></label>
@@ -452,30 +494,61 @@ const HomePage = () => {
                             <button type="submit" className="button">Add Entry</button>
                         </form>
                         {message && <p className="mt-2 text-green-400">{message}</p>}
-                        <button onClick={handleTodayClick} className="button">All Entries</button>
                     </div>
                 </div>
 
                 <div className="content">
-                    <div className="chart-container">
-                        <h3>Spending by Category:</h3>
-                        <div className="pie-chart2">
-                            <Pie 
-                                data={pieChart2Data} 
-                                options={{
-                                    maintainAspectRatio: true, responsive: true,
-                                    plugins: {
-                                        legend: { display: true, position: 'left', labels:{color:'white'} },
-                                    },
-                                }} 
-                            />
+                    <div className="chart-container" style={{ 
+                        overflow: 'hidden', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center',
+                        height: 'auto',  
+                        padding: '10px' 
+                    }}>
+                        <div className="chart-header" style={{ 
+                            width: '100%', 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'center',
+                            marginBottom: '10px'
+                        }}>
+                            <h3>Spending by Category</h3>
+                        </div>
+                        <select 
+                            id="timePeriodSelect"
+                            value={timePeriod}
+                            onChange={handleTimePeriodChange}
+                            style={{
+                                alignSelf: 'flex-end', // Align to the right
+                                marginRight: '150px', // Adjust based on your layout
+                                borderRadius: '8px',
+                                padding: '8px',
+                                backgroundColor: 'rgb(255, 136, 0)',
+                                color: 'white',
+                                border: '1px solid #444',
+                                outline: 'none',
+                            }}
+                        >
+                            {timePeriodOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="pie-chart2" style={{ 
+                            width: '100%', 
+                            maxWidth: '300px', 
+                            height: 'auto' 
+                        }}>
+                            <Pie data={pieChart2Data} options={pieChartOptions} />
                         </div>
                     </div>
 
 
-                    <div className="chart-container"> 
+                    <div className="chart-container" style={{ overflow: 'hidden', marginTop:'25px' }}>
                     <h3>Financial Entries By Date</h3>                   
-                        <div className="calendar-container" style={{ overflow: 'hidden', marginTop:'35px' }}>
+                        <div className="calendar-container">
                             <Calendar
                                 onChange={handleDateClick}
                                 value={date}
@@ -485,23 +558,26 @@ const HomePage = () => {
                     </div>
 
 
+                    
                     <div className="chart-container">
-                        <h3>Upcoming Expenses</h3>
-                        <ul>
-                            {upcomingExpenses.length > 0 ? (
-                                upcomingExpenses.map(expense => (
-                                    <li key={expense._id} className="entry-item">
-                                        <span>
-                                            ${expense.amount} - {expense.comments} on {new Date(expense.date).toLocaleDateString()}
-                                        </span>
-                                    </li>
-                                ))
-                            ) : (
-                                <li>No upcoming expenses.</li>
-                            )}
-                        </ul>
+                        <div className="upcoming-container">
+                            <h3>Upcoming Expenses</h3>
+                            <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '20px'}}>
+                                {upcomingExpenses.length > 0 ? (
+                                    upcomingExpenses.map(expense => (
+                                        <li key={expense._id} style={{ marginBottom: '10px' }}>
+                                            <span>
+                                                ${expense.amount} - {expense.comments} on {new Date(expense.date).toLocaleDateString()}
+                                            </span>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>No upcoming expenses.</li>
+                                )}
+                            </ul>
+                        </div>
                     </div>
-                </div>
+ </div>
 
 
                 {showModal && (
